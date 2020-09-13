@@ -85,7 +85,3 @@ func BenchmarkCheckStrExist(b *testing.B) {
 	}
 
 }
-
-func bloomFilter() {
-
-}
