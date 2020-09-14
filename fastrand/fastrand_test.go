@@ -34,13 +34,13 @@ func fastrandStr(length int) []byte {
 	return ans
 }
 
-func BenchmarkCryptoRandStr(b *testing.B) {
+func BenchmarkCryptorandStr(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		cryptoRandStr(8)
 	}
 }
 
-func BenchmarkMathRandStr(b *testing.B) {
+func BenchmarkMathrandStr(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		mathRandStr(8)
 	}

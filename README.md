@@ -11,11 +11,11 @@ Short url genenrate and redirect.
   goos: windows
   goarch: amd64
   pkg: github.com/drrrMikado/shorten/fastrand
-  BenchmarkCryptoRandStr-2   	  333349	      3228 ns/op	     456 B/op	      33 allocs/op
-  BenchmarkMathRandStr-2     	   15608	     82073 ns/op	       8 B/op	       1 allocs/op
-  BenchmarkFastrandStr-2     	 4958679	       265 ns/op	       8 B/op	       1 allocs/op
+  BenchmarkCryptorandStr-12    	  500660	      2260 ns/op	     456 B/op	      33 allocs/op
+  BenchmarkMathrandStr-12      	   20852	     57259 ns/op	       8 B/op	       1 allocs/op
+  BenchmarkFastrandStr-12      	 6433384	       197 ns/op	       8 B/op	       1 allocs/op
   PASS
-  ok  	github.com/drrrMikado/shorten/fastrand	6.121s
+  ok  	github.com/drrrMikado/shorten/fastrand	4.538s
   ```
 - Using [bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) determine whether the generated string already exists
 - Bloom filter hash function use MurmurHash3 of [MurmurHash](https://en.wikipedia.org/wiki/MurmurHash)
