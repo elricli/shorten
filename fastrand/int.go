@@ -1,4 +1,4 @@
-package rand
+package fastrand
 
 import (
 	"sync"
