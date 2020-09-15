@@ -1,4 +1,10 @@
+server_domain: www.example.com # maybe can delete.
+
 redis:
   addr: localhost:6379
   password: password
   db: 0
+
+bloom_filter:
+  expected_insertions: 10000000
+  fpp: 0.00001

@@ -2,7 +2,6 @@
 
 Short url genenrate and redirect.
 
-
 ## Key Features
 
 - Using [xorshift](https://en.wikipedia.org/wiki/Xorshift) genenrate pseudorandom number. Benchmark output:
@@ -22,7 +21,8 @@ Short url genenrate and redirect.
 
 ## TODO
 
-- [ ] Redis storage
+- [x] Redis storage
+- [ ] inner HTML template
 - [ ] Generating strings multiple times for a link should be the same as before
 - [ ] Reverse lookup
 - [ ] Visit count
