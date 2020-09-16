@@ -22,7 +22,6 @@ Short url genenrate and redirect.
 ## TODO
 
 - [x] Redis storage
-- [ ] inner HTML template
+- [x] inner HTML template
 - [ ] Generating strings multiple times for a link should be the same as before
-- [ ] Reverse lookup
 - [ ] Visit count

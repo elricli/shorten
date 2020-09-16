@@ -15,7 +15,9 @@ var (
 func Serve(s *service.Service) {
 	svc = s
 	r := mux.NewRouter()
-	r.HandleFunc("/shorten", Shorten).Methods(http.MethodPost)
+	r.HandleFunc("/", Index)
+	r.HandleFunc("/api/shorten", Shorten).Methods(http.MethodPost)
+	r.HandleFunc("/shorten", Shorten2).Methods(http.MethodPost, http.MethodGet)
 	r.HandleFunc("/{key:[0-9a-zA-Z]{10}}", Redirect).Methods(http.MethodGet)
-	go http.ListenAndServe(":8182", r)
+	go http.ListenAndServe(":80", r)
 }
