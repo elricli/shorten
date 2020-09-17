@@ -1,10 +1,10 @@
 ## Intro
 
-Short url genenrate and redirect.
+Fast generate short url and redirection.
 
 ## Key Features
 
-- Using [xorshift](https://en.wikipedia.org/wiki/Xorshift) genenrate pseudorandom number. Benchmark output:
+- Using [xorshift](https://en.wikipedia.org/wiki/Xorshift) fast generate pseudorandom number. Benchmark output:
 
   ```
   goos: windows
@@ -16,7 +16,7 @@ Short url genenrate and redirect.
   PASS
   ok  	github.com/drrrMikado/shorten/fastrand	4.538s
   ```
-- Using [bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) determine whether the generated string already exists
+- Using [bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) fast determine whether the generated string already exists
 - Bloom filter hash function use MurmurHash3 of [MurmurHash](https://en.wikipedia.org/wiki/MurmurHash)
 
 ## TODO
@@ -24,4 +24,4 @@ Short url genenrate and redirect.
 - [x] Redis storage
 - [x] inner HTML template
 - [ ] Generating strings multiple times for a link should be the same as before
-- [ ] Visit count
+- [ ] Visit count (long term)

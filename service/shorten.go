@@ -14,8 +14,8 @@ var (
 	redisHashKey = "shorten_hash_table_key"
 )
 
-// Shorten url.
-func (s *Service) Shorten(rawurl string) (key string, err error) {
+// Insert url.
+func (s *Service) Insert(rawurl string) (key string, err error) {
 	if !validator.IsURL(rawurl) {
 		err = errors.New(rawurl + " is not valid url")
 		return
@@ -35,8 +35,8 @@ func (s *Service) Shorten(rawurl string) (key string, err error) {
 	return
 }
 
-// Redirect get url by key.
-func (s *Service) Redirect(key string) (v string, err error) {
+// Get url by key.
+func (s *Service) Get(key string) (v string, err error) {
 	if !s.bf.MightContain([]byte(key)) {
 		return "", errors.New("key not exist")
 	}
