@@ -2,12 +2,14 @@ package bloomfilter
 
 import (
 	"math"
+	"sync"
 
-	"github.com/drrrMikado/shorten/hash"
+	"github.com/drrrMikado/shorten/internal/hash"
 )
 
 // BloomFilter .
 type BloomFilter struct {
+	mut              sync.Mutex
 	bitArray         []uint32
 	numBits          uint32
 	numHashFunctions uint32
@@ -23,12 +25,15 @@ func New(expectedInsertions uint32, fpp float64) *BloomFilter {
 		numBits:          m,
 		numHashFunctions: k,
 		fpp:              fpp,
+		mut:              sync.Mutex{},
 	}
 	return bf
 }
 
 // Insert to bloomfilter's bitmap.
 func (bf *BloomFilter) Insert(key []byte) {
+	bf.mut.Lock()
+	defer bf.mut.Unlock()
 	h := uint32(0)
 	for i := uint32(0); i < bf.numHashFunctions; i++ {
 		h |= hash.Murmur3_32(key)
@@ -39,6 +44,8 @@ func (bf *BloomFilter) Insert(key []byte) {
 
 // MightContain return true if key might contain.
 func (bf *BloomFilter) MightContain(key []byte) bool {
+	bf.mut.Lock()
+	defer bf.mut.Unlock()
 	h := uint32(0)
 	for i := uint32(0); i < bf.numHashFunctions; i++ {
 		h |= hash.Murmur3_32(key)

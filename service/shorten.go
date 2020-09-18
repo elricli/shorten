@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/drrrMikado/shorten/fastrand"
-	"github.com/drrrMikado/shorten/validator"
+	"github.com/drrrMikado/shorten/internal/fastrand"
+	"github.com/drrrMikado/shorten/internal/validator"
 )
 
 var (

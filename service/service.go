@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/drrrMikado/shorten/bloomfilter"
 	"github.com/drrrMikado/shorten/conf"
-	"github.com/drrrMikado/shorten/database"
+	"github.com/drrrMikado/shorten/internal/bloomfilter"
+	"github.com/drrrMikado/shorten/internal/database"
 	"github.com/go-redis/redis/v8"
 )
 
