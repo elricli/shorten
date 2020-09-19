@@ -2,40 +2,46 @@ package service
 
 import (
 	"context"
-	"log"
 
-	"github.com/drrrMikado/shorten/conf"
 	"github.com/drrrMikado/shorten/internal/bloomfilter"
+	"github.com/drrrMikado/shorten/internal/config"
 	"github.com/drrrMikado/shorten/internal/database"
 	"github.com/go-redis/redis/v8"
 )
 
 // Service struct.
 type Service struct {
-	c   *conf.Config
+	c   *config.Config
 	rdb *redis.Client
 	bf  *bloomfilter.BloomFilter
 }
 
 // New service.
-func New(ctx context.Context, cfg *conf.Config) *Service {
+func New(ctx context.Context, cfg *config.Config) (*Service, error) {
+	redisClient, err := database.NewRedisClient(ctx, cfg.Redis)
+	if err != nil {
+		return nil, err
+	}
 	s := &Service{
 		c:   cfg,
-		rdb: database.NewRedisClient(ctx, cfg.Redis),
+		rdb: redisClient,
 	}
 	// set bloom filter
-	s.bf = bloomfilter.New(cfg.BloomFilter.ExpectedInsertions, cfg.BloomFilter.FPP)
-	result, err := s.rdb.HGetAll(ctx, redisHashKey).Result()
+	s.bf, err = bloomfilter.New(cfg.BloomFilter.ExpectedInsertions, cfg.BloomFilter.FPP, cfg.BloomFilter.HashSeed)
 	if err != nil {
-		log.Fatalln("redis HGetAll err:", err)
+		return nil, err
 	}
-	for k := range result {
+	redisResult, err := s.rdb.HGetAll(ctx, redisHashTableKey).Result()
+	if err != nil {
+		return nil, err
+	}
+	for k := range redisResult {
 		s.bf.Insert([]byte(k))
 	}
-	return s
+	return s, nil
 }
 
 // Close service.
-func (s *Service) Close() {
-	_ = s.rdb.Close()
+func (s *Service) Close() error {
+	return s.rdb.Close()
 }

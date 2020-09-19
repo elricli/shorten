@@ -1,6 +1,7 @@
 package bloomfilter
 
 import (
+	"errors"
 	"math"
 	"sync"
 
@@ -10,33 +11,37 @@ import (
 // BloomFilter .
 type BloomFilter struct {
 	mut              sync.Mutex
-	bitArray         []uint32
-	numBits          uint32
-	numHashFunctions uint32
+	bitArray         []uint
+	numBits          uint
+	numHashFunctions uint
 	fpp              float64
+	hashSeed         uint
 }
 
 // New return a bloomFilter struct. fpp is probability of false positives
-func New(expectedInsertions uint32, fpp float64) *BloomFilter {
+func New(expectedInsertions uint, fpp float64, hashSeed uint) (*BloomFilter, error) {
+	if expectedInsertions > math.MaxUint64 {
+		return nil, errors.New("expected insertions too large")
+	}
 	m := optimalNumOfBits(expectedInsertions, fpp)
 	k := optimalNumOfHashFunctions(fpp)
-	bf := &BloomFilter{
-		bitArray:         make([]uint32, m),
+	return &BloomFilter{
+		mut:              sync.Mutex{},
+		bitArray:         make([]uint, m),
 		numBits:          m,
 		numHashFunctions: k,
 		fpp:              fpp,
-		mut:              sync.Mutex{},
-	}
-	return bf
+		hashSeed:         hashSeed,
+	}, nil
 }
 
 // Insert to bloom filter's bit array.
 func (bf *BloomFilter) Insert(key []byte) {
 	bf.mut.Lock()
 	defer bf.mut.Unlock()
-	h := uint32(0)
-	for i := uint32(0); i < bf.numHashFunctions; i++ {
-		h |= hash.Murmur3_32(key)
+	var h uint
+	for i := uint(0); i < bf.numHashFunctions; i++ {
+		h |= hash.Murmur3_32(key, bf.hashSeed)
 		bitPos := h % bf.numBits
 		bf.bitArray[bitPos] |= 1
 	}
@@ -46,9 +51,9 @@ func (bf *BloomFilter) Insert(key []byte) {
 func (bf *BloomFilter) MightContain(key []byte) bool {
 	bf.mut.Lock()
 	defer bf.mut.Unlock()
-	h := uint32(0)
-	for i := uint32(0); i < bf.numHashFunctions; i++ {
-		h |= hash.Murmur3_32(key)
+	var h uint
+	for i := uint(0); i < bf.numHashFunctions; i++ {
+		h |= hash.Murmur3_32(key, bf.hashSeed)
 		bitPos := h % bf.numBits
 		if bf.bitArray[bitPos] == 0 {
 			return false
@@ -57,12 +62,12 @@ func (bf *BloomFilter) MightContain(key []byte) bool {
 	return true
 }
 
-func optimalNumOfBits(expectedInsertions uint32, fpp float64) uint32 {
+func optimalNumOfBits(expectedInsertions uint, fpp float64) uint {
 	// see https://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives
-	return uint32(math.Round(-1 * float64(expectedInsertions) * math.Log(fpp) / (math.Ln2 * math.Ln2)))
+	return uint(math.Round(-1 * float64(expectedInsertions) * math.Log(fpp) / (math.Ln2 * math.Ln2)))
 }
 
-func optimalNumOfHashFunctions(fpp float64) uint32 {
+func optimalNumOfHashFunctions(fpp float64) uint {
 	// see https://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives
-	return uint32(math.Round(-1 * math.Log2(fpp)))
+	return uint(math.Round(-1 * math.Log2(fpp)))
 }

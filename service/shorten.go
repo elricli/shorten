@@ -11,14 +11,13 @@ import (
 )
 
 var (
-	redisHashKey = "shorten_hash_table_key"
+	redisHashTableKey = "shorten_hash_table_key"
 )
 
 // Insert url.
 func (s *Service) Insert(ctx context.Context, rawurl string) (key string, err error) {
 	if !validator.IsURL(rawurl) {
-		err = errors.New(rawurl + " is not valid url")
-		return
+		return "", errors.New(rawurl + " is not valid url")
 	}
 	for {
 		key = fastrand.String(10)
@@ -27,8 +26,10 @@ func (s *Service) Insert(ctx context.Context, rawurl string) (key string, err er
 		}
 		log.Println("key might contain, key:", key)
 	}
-	if err = s.rdb.HSet(ctx, redisHashKey, key, rawurl).Err(); err != nil {
-		log.Println("HSet err:", err)
+	if key == "" {
+		return "", errors.New("key is empty")
+	}
+	if err = s.rdb.HSet(ctx, redisHashTableKey, key, rawurl).Err(); err != nil {
 		return
 	}
 	go s.bf.Insert([]byte(key))
@@ -40,10 +41,9 @@ func (s *Service) Get(ctx context.Context, key string) (v string, err error) {
 	if !s.bf.MightContain([]byte(key)) {
 		return "", errors.New("key not exist")
 	}
-	v, err = s.rdb.HGet(ctx, redisHashKey, key).Result()
+	v, err = s.rdb.HGet(ctx, redisHashTableKey, key).Result()
 	if err != nil {
-		log.Println("HGet field:", key, " err:", err)
-		return "", err
+		return
 	}
 	var u *url.URL
 	u, err = url.Parse(v)
