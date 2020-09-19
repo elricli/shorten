@@ -9,13 +9,13 @@ import (
 )
 
 // NewRedisClient return a redis client.
-func NewRedisClient(c conf.Redis) *redis.Client {
+func NewRedisClient(ctx context.Context, cfg conf.Redis) *redis.Client {
 	client := redis.NewClient(&redis.Options{
-		Addr:     c.Addr,
-		Password: c.Password,
-		DB:       c.DB,
+		Addr:     cfg.Addr,
+		Password: cfg.Password,
+		DB:       cfg.DB,
 	})
-	if err := client.Ping(context.Background()).Err(); err != nil {
+	if err := client.Ping(ctx).Err(); err != nil {
 		log.Fatalln(err)
 	}
 	return client

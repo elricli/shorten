@@ -30,7 +30,7 @@ func New(expectedInsertions uint32, fpp float64) *BloomFilter {
 	return bf
 }
 
-// Insert to bloomfilter's bitmap.
+// Insert to bloom filter's bit array.
 func (bf *BloomFilter) Insert(key []byte) {
 	bf.mut.Lock()
 	defer bf.mut.Unlock()

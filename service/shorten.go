@@ -15,7 +15,7 @@ var (
 )
 
 // Insert url.
-func (s *Service) Insert(rawurl string) (key string, err error) {
+func (s *Service) Insert(ctx context.Context, rawurl string) (key string, err error) {
 	if !validator.IsURL(rawurl) {
 		err = errors.New(rawurl + " is not valid url")
 		return
@@ -27,22 +27,22 @@ func (s *Service) Insert(rawurl string) (key string, err error) {
 		}
 		log.Println("key might contain, key:", key)
 	}
-	if err = s.rdb.HSet(context.Background(), redisHashKey, key, rawurl).Err(); err != nil {
-		log.Println("hset err:", err)
+	if err = s.rdb.HSet(ctx, redisHashKey, key, rawurl).Err(); err != nil {
+		log.Println("HSet err:", err)
 		return
 	}
-	s.bf.Insert([]byte(key))
+	go s.bf.Insert([]byte(key))
 	return
 }
 
 // Get url by key.
-func (s *Service) Get(key string) (v string, err error) {
+func (s *Service) Get(ctx context.Context, key string) (v string, err error) {
 	if !s.bf.MightContain([]byte(key)) {
 		return "", errors.New("key not exist")
 	}
-	v, err = s.rdb.HGet(context.Background(), redisHashKey, key).Result()
+	v, err = s.rdb.HGet(ctx, redisHashKey, key).Result()
 	if err != nil {
-		log.Println("hget field:", key, " err:", err)
+		log.Println("HGet field:", key, " err:", err)
 		return "", err
 	}
 	var u *url.URL

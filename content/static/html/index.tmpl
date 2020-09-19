@@ -29,10 +29,10 @@ Your shortened URL is:<br/>
 let domain = window.location.origin + "/"+{{.URL}};
 document.getElementById("short_url").setAttribute("value", domain);
 function select_text() {
-	var urlbox = document.getElementById("short_url");
-	if (urlbox) {
-		urlbox.focus();
-		urlbox.select();
+	var urlBox = document.getElementById("short_url");
+	if (urlBox) {
+		urlBox.focus();
+		urlBox.select();
 	}
 }
 {{end}}

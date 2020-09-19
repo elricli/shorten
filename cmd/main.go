@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"os"
@@ -18,13 +19,14 @@ var (
 
 func init() {
 	log.SetFlags(log.Ldate | log.Lshortfile | log.Lmicroseconds)
-	flag.StringVar(&config, "config", "conf/conf.yml", "config file path")
+	flag.StringVar(&config, "config", "conf/config.yml", "config file path")
 }
 
 func main() {
 	flag.Parse()
+	ctx := context.Background()
 	c := conf.Init(config)
-	svc := service.New(c)
+	svc := service.New(ctx, c)
 	server.Serve(svc)
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)

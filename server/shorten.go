@@ -41,10 +41,10 @@ Your shortened URL is:<br/>
 let domain = window.location.origin + "/"+{{.URL}};
 document.getElementById("short_url").setAttribute("value", domain);
 function select_text() {
-	var urlbox = document.getElementById("short_url");
-	if (urlbox) {
-		urlbox.focus();
-		urlbox.select();
+	var ulrBox= document.getElementById("short_url");
+	if (ulrBox) {
+		ulrBox.focus();
+		ulrBox.select();
 	}
 }
 {{end}}
@@ -52,8 +52,8 @@ function select_text() {
 </html>
 `
 
-// T is template struct.
-type T struct {
+// TemplateData is template struct.
+type TemplateData struct {
 	URL    string
 	ErrMsg string
 	OriURL string
@@ -61,22 +61,23 @@ type T struct {
 
 var (
 	// ErrLinkNotExist .
-	ErrLinkNotExist = errors.New("Sorry, the link you accessed doesn't exist on our service. Please keep in mind that our shortened links are case sensitive and may contain letters and numbers")
+	ErrLinkNotExist = errors.New("sorry, the link you accessed doesn't exist on our service. Please keep in mind that our shortened links are case sensitive and may contain letters and numbers")
 )
 
 // ShortenAPI http handler.
 func ShortenAPI(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	ctx := r.Context()
+	_ = r.ParseForm()
 	url := r.Form.Get("url")
-	key, err := svc.Insert(url)
+	key, err := svc.Insert(ctx, url)
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"errcode": 1,
 			"errmsg":  err.Error(),
 		})
 		return
 	}
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"errcode": 0,
 		"errmsg":  "",
 		"data":    key,
@@ -85,24 +86,26 @@ func ShortenAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 // Shorten http handler..
-func Shorten(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+func Shorten(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
+	_ = r.ParseForm()
 	url := r.Form.Get("url")
-	t := T{}
-	key, err := svc.Insert(url)
+	t := TemplateData{}
+	key, err := svc.Insert(ctx, url)
 	if err != nil {
 		t.ErrMsg = err.Error()
 	}
 	t.URL = key
 	t.OriURL = url
 	tmpl := template.Must(template.New("index").Parse(indexTemplate))
-	tmpl.Execute(w, t)
+	return tmpl.Execute(w, t)
 }
 
 // Redirect http handler.
 func Redirect(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	key := mux.Vars(r)["key"]
-	url, err := svc.Get(key)
+	url, err := svc.Get(ctx, key)
 	if err != nil || url == "" {
 		http.Error(w, ErrLinkNotExist.Error(), http.StatusBadRequest)
 		return
@@ -112,7 +115,7 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 }
 
 // Index handler.
-func Index(w http.ResponseWriter, r *http.Request) {
+func Index(w http.ResponseWriter, _ *http.Request) error {
 	tmpl := template.Must(template.New("index").Parse(indexTemplate))
-	tmpl.Execute(w, T{})
+	return tmpl.Execute(w, TemplateData{})
 }

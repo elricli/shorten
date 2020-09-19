@@ -18,16 +18,16 @@ type Service struct {
 }
 
 // New service.
-func New(c *conf.Config) *Service {
+func New(ctx context.Context, cfg *conf.Config) *Service {
 	s := &Service{
-		c:   c,
-		rdb: database.NewRedisClient(c.Redis),
+		c:   cfg,
+		rdb: database.NewRedisClient(ctx, cfg.Redis),
 	}
 	// set bloom filter
-	s.bf = bloomfilter.New(c.BloomFilter.ExpectedInsertions, c.BloomFilter.FPP)
-	result, err := s.rdb.HGetAll(context.Background(), redisHashKey).Result()
+	s.bf = bloomfilter.New(cfg.BloomFilter.ExpectedInsertions, cfg.BloomFilter.FPP)
+	result, err := s.rdb.HGetAll(ctx, redisHashKey).Result()
 	if err != nil {
-		log.Fatalln("redis hgetall err:", err)
+		log.Fatalln("redis HGetAll err:", err)
 	}
 	for k := range result {
 		s.bf.Insert([]byte(k))
@@ -37,5 +37,5 @@ func New(c *conf.Config) *Service {
 
 // Close service.
 func (s *Service) Close() {
-	s.rdb.Close()
+	_ = s.rdb.Close()
 }
