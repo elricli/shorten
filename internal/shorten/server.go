@@ -59,7 +59,7 @@ func (s *Server) Install() http.Handler {
 	r.HandleFunc("/shorten", s.shortenAPI).
 		Methods(http.MethodPost).
 		PathPrefix("/api/")
-	// r.PathPrefix("/static/").Handler(http.FileServer(http.Dir("content")))
+	r.PathPrefix("/static/").Handler(http.FileServer(http.Dir("content")))
 	return r
 }
 

@@ -91,7 +91,9 @@ func GetEnvFloat64(key string, fallback float64) float64 {
 
 // Dump outputs the current config information to the given Writer.
 func (c *Config) Dump(w io.Writer) error {
-	fmt.Fprint(w, "config: ")
+	if _, err := fmt.Fprint(w, "config: "); err != nil {
+		return err
+	}
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "    ")
 	return enc.Encode(c)

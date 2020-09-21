@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	cfg.Dump(os.Stdout)
+	_ = cfg.Dump(os.Stdout)
 	redisClient, err := database.NewRedisClient(ctx, cfg.Redis)
 	if err != nil {
 		log.Fatalf("unable to new redis client: %v\n", err)
