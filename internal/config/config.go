@@ -1,6 +1,9 @@
 package config
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
 	"os"
 	"strconv"
 )
@@ -14,7 +17,7 @@ type Config struct {
 // Redis config.
 type Redis struct {
 	Addr     string
-	Password string
+	Password string `json:"-"`
 	DB       int
 }
 
@@ -84,4 +87,12 @@ func GetEnvFloat64(key string, fallback float64) float64 {
 		}
 	}
 	return fallback
+}
+
+// Dump outputs the current config information to the given Writer.
+func (c *Config) Dump(w io.Writer) error {
+	fmt.Fprint(w, "config: ")
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "    ")
+	return enc.Encode(c)
 }
