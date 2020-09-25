@@ -35,7 +35,7 @@ func Init() (*Config, error) {
 		Domain: GetEnv("SHORTEN_DOMAIN", "http://localhost"),
 		Redis: Redis{
 			Addr:     GetEnv("SHORTEN_REDIS_ADDR", "localhost:6379"),
-			Password: GetEnv("SHORTEN_REDIS_PASSWORD", "password"),
+			Password: GetEnv("SHORTEN_REDIS_PASSWORD", ""),
 			DB:       GetEnvInt("SHORTEN_REDIS_DB", 0),
 		},
 		BloomFilter: BloomFilter{
