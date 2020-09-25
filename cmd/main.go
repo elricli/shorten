@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -14,11 +15,17 @@ import (
 	"github.com/drrrMikado/shorten/internal/shorten"
 )
 
+var (
+	staticPath string
+)
+
 func init() {
+	flag.StringVar(&staticPath, "static", "content/static", "static file path")
 	log.SetFlags(log.Ldate | log.Lshortfile | log.Lmicroseconds)
 }
 
 func main() {
+	flag.Parse()
 	ctx := context.Background()
 	cfg, err := config.Init()
 	if err != nil {
@@ -36,6 +43,7 @@ func main() {
 	scfg := shorten.ServerConfig{
 		RedisClient: redisClient,
 		BloomFilter: bf,
+		StaticPath:  staticPath,
 	}
 	server := shorten.NewServer(cfg, scfg)
 	handler := server.Install()

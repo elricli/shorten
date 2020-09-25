@@ -10,6 +10,7 @@ import (
 
 // Config is all config struct.
 type Config struct {
+	Domain      string
 	Redis       Redis
 	BloomFilter BloomFilter
 }
@@ -31,6 +32,7 @@ type BloomFilter struct {
 // Init config content.
 func Init() (*Config, error) {
 	return &Config{
+		Domain: GetEnv("SHORTEN_DOMAIN", "http://localhost"),
 		Redis: Redis{
 			Addr:     GetEnv("SHORTEN_REDIS_ADDR", "localhost:6379"),
 			Password: GetEnv("SHORTEN_REDIS_PASSWORD", "password"),

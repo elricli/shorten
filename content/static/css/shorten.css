@@ -77,10 +77,6 @@ h2 {
 h3 {
   font-size: 1rem;
 }
-/**
-    * As header elements are not interactive, it鈥檚 okay to remove the visual
-    * indicator. https://css-tricks.com/focus-styles-non-interactive-elements/
-    */
 h1:focus,
 h2:focus,
 h3:focus,
@@ -111,6 +107,7 @@ code {
 @media only screen and (min-width: 57.7rem) {
   .site-content {
     padding: 0 1.5rem;
+    display: flex;
   }
 }
 
@@ -133,27 +130,41 @@ code {
     margin: 3.125rem auto;
   }
 }
-.homepage-form input {
-  background: url("/static/img/icon-search.svg") right no-repeat;
-  background-position: left 0.75rem center;
-  background-size: 1.5rem;
+.shorten-form input {
   border: 0.0625rem solid var(--gray-8);
-  border-radius: 0.5rem 0 0 0.5rem;
+  border-radius: 0.5rem;
   color: var(--gray-4);
   font-family: inherit;
   font-size: 1rem;
   height: 3rem;
-  padding-left: 2.75rem;
+  padding-left: 0.275rem;
   width: 37.6875rem;
+  margin-right: 3%;
 }
-.homepage-button-group {
+@media (max-width: 991px) {
+  .shorten-form input {
+    width: 100%;
+    margin: 0;
+    margin-bottom: 10px;
+    height: 3rem;
+  }
+}
+.shorten-button-group {
   display: flex;
   justify-content: center;
   margin: 2.5rem auto auto 0;
+  /* margin: 2.5rem auto; */
 }
-.homepage-button {
+@media (max-width: 991px) {
+  .shorten-button-group {
+    display: block;
+    margin: 0;
+  }
+}
+.shorten-button {
   border: none;
-  border-radius: 0 0.5rem 0.5rem 0;
+  /* border-radius: 0 0.5rem 0.5rem 0; */
+  border-radius: 0.5rem;
   background-color: var(--turq-dark);
   color: var(--white);
   cursor: pointer;
@@ -162,66 +173,44 @@ code {
   height: 3rem;
   padding: 0 1.375rem;
   width: 7.375rem;
+  position: relative;
+  outline: none;
 }
-.homepage-help {
-  width: 100%;
-  max-width: 45.0625rem;
-  display: block;
-  align-items: center;
-  justify-content: space-between;
-  margin: auto;
+.shorten-button:hover {
+  background-color: #008ebe;
+}
+@media (max-width: 991px) {
+  .shorten-button {
+    width: 100%;
+    padding: 15px;
+  }
+}
+.error-msg {
+  font-size: 18px;
   text-align: center;
+  line-height: 2.5rem;
+  background-color: #e66465;
+  color: #731b14;
+  border-radius: 0.5rem;
+  margin: 0.5rem auto;
+  display: none;
 }
-@media only screen and (min-width: 30rem) {
-  .homepage-help {
-    display: flex;
+@media (max-width: 991px) {
+  .error-msg {
+    width: 100%;
+    padding: 0;
+    margin-top: 0.5rem;
   }
 }
-.homepage-result {
+.shorten-button.copied {
+  background: #649949;
+  color: transparent;
+}
+.shorten-button.copied:before {
+  content: "Copied!";
+  color: #fff;
+  position: absolute;
+  left: 0;
   width: 100%;
-  max-width: 45.0625rem;
-  display: block;
-  align-items: center;
-  justify-content: space-between;
-  margin: auto;
   text-align: center;
-}
-@media only screen and (min-width: 30rem) {
-  .homepage-result {
-    display: flex;
-  }
-}
-.homepage-example {
-  align-items: center;
-  color: var(--gray-2);
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin: 1.125rem auto 1rem;
-  text-align: center;
-  width: 100%;
-}
-@media only screen and (min-width: 30rem) {
-  .homepage-example {
-    display: flex;
-  }
-}
-.homepage-example-label {
-  display: block;
-  margin-bottom: 1rem;
-  /* text-transform: uppercase; */
-}
-
-@media only screen and (min-width: 30rem) {
-  .homepage-example-label {
-    display: inline;
-    margin-bottom: -0.1rem;
-  }
-}
-
-.homepage-example-shorten {
-  color: var(--turq-dark);
-  font-size: 1rem;
-  font-weight: initial;
-  padding: 0 0.625rem;
 }

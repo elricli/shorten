@@ -3,7 +3,6 @@ package shorten
 import (
 	"encoding/json"
 	"errors"
-	"html/template"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -24,19 +23,14 @@ type Server struct {
 	cfg         *config.Config
 	redisClient *redis.Client
 	bloomFilter *bloomfilter.BloomFilter
+	staticPath  string
 }
 
 // ServerConfig contains everything needed by a server.
 type ServerConfig struct {
 	RedisClient *redis.Client
 	BloomFilter *bloomfilter.BloomFilter
-}
-
-// TemplateData is template struct.
-type TemplateData struct {
-	URL    string
-	ErrMsg string
-	OriURL string
+	StaticPath  string
 }
 
 // NewServer creates as new Server with the given dependencies.
@@ -45,29 +39,35 @@ func NewServer(cfg *config.Config, scfg ServerConfig) *Server {
 		cfg:         cfg,
 		redisClient: scfg.RedisClient,
 		bloomFilter: scfg.BloomFilter,
+		staticPath:  scfg.StaticPath,
 	}
 }
 
 // Install registers server routes.
 func (s *Server) Install() http.Handler {
 	r := mux.NewRouter()
-	r.HandleFunc("/", s.errorWrap(s.index))
-	r.HandleFunc("/shorten", s.errorWrap(s.shorten)).
-		Methods(http.MethodPost, http.MethodGet)
-	r.HandleFunc("/{key:[0-9a-zA-Z]{10}}", s.errorWrap(s.redirect)).
+	// API router
+	r.HandleFunc("/{key:[0-9a-zA-Z]{7}}", s.errorWrap(s.redirect)).
 		Methods(http.MethodGet)
-	r.HandleFunc("/shorten", s.shortenAPI).
-		Methods(http.MethodPost).
-		PathPrefix("/api/")
-	r.PathPrefix("/static/").Handler(http.FileServer(http.Dir("content")))
+	r.HandleFunc("/api/shorten", s.shorten).
+		Methods(http.MethodPost)
+	// frontend router
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, s.staticPath+"/html/index.html")
+	})
+	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, s.staticPath+"/img/favicon.ico")
+	})
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(s.staticPath))))
+
 	return r
 }
 
-func (s *Server) shortenAPI(w http.ResponseWriter, r *http.Request) {
+func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	_ = r.ParseForm()
 	url := r.Form.Get("url")
-	key, err := Insert(ctx, url, s.redisClient, s.bloomFilter)
+	key, err := Insert(ctx, url, s.cfg.Domain, s.redisClient, s.bloomFilter)
 	if err != nil {
 		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"errcode": 1,
@@ -83,21 +83,6 @@ func (s *Server) shortenAPI(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (s *Server) shorten(w http.ResponseWriter, r *http.Request) error {
-	ctx := r.Context()
-	_ = r.ParseForm()
-	url := r.Form.Get("url")
-	t := TemplateData{}
-	key, err := Insert(ctx, url, s.redisClient, s.bloomFilter)
-	if err != nil {
-		t.ErrMsg = err.Error()
-	}
-	t.URL = key
-	t.OriURL = url
-	tmpl := template.Must(template.New("index").Parse(indexTemplate))
-	return tmpl.Execute(w, t)
-}
-
 func (s *Server) redirect(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	key := mux.Vars(r)["key"]
@@ -107,11 +92,6 @@ func (s *Server) redirect(w http.ResponseWriter, r *http.Request) error {
 	}
 	http.Redirect(w, r, url, http.StatusMovedPermanently)
 	return nil
-}
-
-func (s *Server) index(w http.ResponseWriter, _ *http.Request) error {
-	tmpl := template.Must(template.New("index").Parse(indexTemplate))
-	return tmpl.Execute(w, TemplateData{})
 }
 
 func (s *Server) errorWrap(f func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
