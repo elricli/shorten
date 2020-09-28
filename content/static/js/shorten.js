@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         copyBtnElem.style.display = "none";
         submitBtnElem.style.display = "block";
         urlInputElem.removeEventListener("change", shortenURLInputTrigger);
+        urlInputElem.removeEventListener("input", shortenURLInputTrigger);
     }
     formElem.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             copyBtnElem.style.display = "block";
             submitBtnElem.style.display = "none";
             urlInputElem.addEventListener("change", shortenURLInputTrigger);
+            urlInputElem.addEventListener("input", shortenURLInputTrigger);
         };
         xhr.send("url=" + urlInputElem.value);
     });
