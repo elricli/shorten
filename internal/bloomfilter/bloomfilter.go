@@ -10,12 +10,13 @@ import (
 
 // BloomFilter .
 type BloomFilter struct {
-	mut              sync.Mutex
+	mut              *sync.Mutex
 	bitArray         []uint
 	numBits          uint
 	numHashFunctions uint
 	fpp              float64
 	hashSeed         uint
+	NumUsed          uint
 }
 
 // New return a bloomFilter struct. fpp is probability of false positives
@@ -26,7 +27,7 @@ func New(expectedInsertions uint, fpp float64, hashSeed uint) (*BloomFilter, err
 	m := optimalNumOfBits(expectedInsertions, fpp)
 	k := optimalNumOfHashFunctions(fpp)
 	return &BloomFilter{
-		mut:              sync.Mutex{},
+		mut:              &sync.Mutex{},
 		bitArray:         make([]uint, m),
 		numBits:          m,
 		numHashFunctions: k,
@@ -45,6 +46,7 @@ func (bf *BloomFilter) Insert(key []byte) {
 		bitPos := h % bf.numBits
 		bf.bitArray[bitPos] |= 1
 	}
+	bf.NumUsed++
 }
 
 // MightContain return true if key might contain.
