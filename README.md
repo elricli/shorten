@@ -4,16 +4,28 @@ Fast generate short url and redirection.
 
 ## Deployment
 
-Set the following environment variables:
+1. Using `docker`:
 
-   - `SHORTEN_REDIS_ADDR` (default: localhost:6379)
-   - `SHORTEN_REDIS_PASSWORD` (default: '')
-   - `SHORTEN_DOMAIN` (default: localhost)
-   - `SHORTEN_BLOOM_FILTER_EXPECTED_INSERTIONS` (default: 1e7)
-   - `SHORTEN_BLOOM_FILTER_FPP` (default: 0.00001)
-   - `SHORTEN_BLOOM_FILTER_HASH_SEED` (default: 0x1)
+   > Note: Once docker restart, the redis's data will be lost.
 
-   See `internal/config/config.go` for details.
+   1. Copy `docker-compose.sample.yml` and rename to `docker-compose.yml`.
+   2. Modify environment in `docker-compose.yml`.
+   3. Run `docker-compose up`.
+
+2. Build
+
+   1. Set the following environment variables
+
+      - `SHORTEN_REDIS_ADDR` (default: localhost:6379)
+      - `SHORTEN_REDIS_PASSWORD` (default: '')
+      - `SHORTEN_DOMAIN` (default: localhost)
+      - `SHORTEN_BLOOM_FILTER_EXPECTED_INSERTIONS` (default: 1e7)
+      - `SHORTEN_BLOOM_FILTER_FPP` (default: 0.00001)
+      - `SHORTEN_BLOOM_FILTER_HASH_SEED` (default: 0x1)
+
+      See `internal/config/config.go` for details.
+
+   2. Build binary file and run it.
 
 ## Key Features
 
@@ -29,5 +41,6 @@ Set the following environment variables:
   PASS
   ok  	github.com/drrrMikado/shorten/fastrand	4.538s
   ```
+
 - Using [bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) fast determine whether the generated string already exists
 - Bloom filter hash function use MurmurHash3 of [MurmurHash](https://en.wikipedia.org/wiki/MurmurHash)

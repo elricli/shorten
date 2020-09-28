@@ -1,3 +1,4 @@
 .idea
 shorten
 data/
+docker-compose.yml
