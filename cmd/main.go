@@ -47,7 +47,7 @@ func main() {
 	}
 	server := shorten.NewServer(cfg, scfg)
 	handler := server.Install()
-	go log.Fatalln(http.ListenAndServe(":80", handler))
+	go log.Fatalln(http.ListenAndServe(":8080", handler))
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
 	for {
