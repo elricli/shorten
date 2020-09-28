@@ -6,11 +6,11 @@ import (
 	"log"
 	"net/http"
 	"runtime/debug"
+	"strings"
 
 	"github.com/drrrMikado/shorten/internal/bloomfilter"
 	"github.com/drrrMikado/shorten/internal/config"
 	"github.com/go-redis/redis/v8"
-	"github.com/gorilla/mux"
 )
 
 var (
@@ -43,24 +43,32 @@ func NewServer(cfg *config.Config, scfg ServerConfig) *Server {
 	}
 }
 
-// Install registers server routes.
-func (s *Server) Install() http.Handler {
-	r := mux.NewRouter()
-	// API router
-	r.HandleFunc("/{key:[0-9a-zA-Z]{7}}", s.errorWrap(s.redirect)).
-		Methods(http.MethodGet)
-	r.HandleFunc("/api/shorten", s.shorten).
-		Methods(http.MethodPost)
-	// frontend router
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, s.staticPath+"/html/index.html")
-	})
-	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+// RegisterHandler registers server routes.
+func (s *Server) RegisterHandler() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, s.staticPath+"/img/favicon.ico")
 	})
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(s.staticPath))))
-
-	return r
+	mux.HandleFunc("/api/shorten", s.shorten)
+	mux.HandleFunc("/", s.errorWrap(func(w http.ResponseWriter, r *http.Request) error {
+		path := r.URL.Path
+		switch path {
+		case "/":
+			http.ServeFile(w, r, s.staticPath+"/html/index.html")
+		default:
+			if strings.HasPrefix(r.URL.Path, "/static") {
+				http.StripPrefix("/static/", http.FileServer(http.Dir("content/static"))).ServeHTTP(w, r)
+			} else {
+				url, err := Get(r.Context(), strings.Trim(path, "/"), s.redisClient, s.bloomFilter)
+				if err != nil || url == "" {
+					return ErrLinkNotExist
+				}
+				http.Redirect(w, r, url, http.StatusMovedPermanently)
+			}
+		}
+		return nil
+	}))
+	return mux
 }
 
 func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
@@ -81,17 +89,6 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 		"data":    key,
 	})
 	return
-}
-
-func (s *Server) redirect(w http.ResponseWriter, r *http.Request) error {
-	ctx := r.Context()
-	key := mux.Vars(r)["key"]
-	url, err := Get(ctx, key, s.redisClient, s.bloomFilter)
-	if err != nil || url == "" {
-		return ErrLinkNotExist
-	}
-	http.Redirect(w, r, url, http.StatusMovedPermanently)
-	return nil
 }
 
 func (s *Server) errorWrap(f func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {

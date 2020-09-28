@@ -12,6 +12,7 @@ import (
 	"github.com/drrrMikado/shorten/internal/bloomfilter"
 	"github.com/drrrMikado/shorten/internal/config"
 	"github.com/drrrMikado/shorten/internal/database"
+	"github.com/drrrMikado/shorten/internal/middleware"
 	"github.com/drrrMikado/shorten/internal/shorten"
 )
 
@@ -40,16 +41,18 @@ func main() {
 	if err != nil {
 		log.Fatalf("bloomfilter.New: %v\n", err)
 	}
-	scfg := shorten.ServerConfig{
+	server := shorten.NewServer(cfg, shorten.ServerConfig{
 		RedisClient: redisClient,
 		BloomFilter: bf,
 		StaticPath:  staticPath,
-	}
-	server := shorten.NewServer(cfg, scfg)
-	handler := server.Install()
-	go log.Fatalln(http.ListenAndServe(":8080", handler))
+	})
+	mw := middleware.Chain(
+		middleware.AcceptRequests(http.MethodGet, http.MethodPost),
+	)
+	handler := server.RegisterHandler()
+	go log.Fatalln(http.ListenAndServe(":8080", mw.Use(handler)))
 	ch := make(chan os.Signal, 1)
-	signal.Notify(ch, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
+	signal.Notify(ch, os.Kill, os.Interrupt)
 	for {
 		s := <-ch
 		log.Println("get a signal", s.String())
