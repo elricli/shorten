@@ -11,7 +11,7 @@ import (
 // BloomFilter .
 type BloomFilter struct {
 	mut              *sync.Mutex
-	bitArray         []uint
+	bitArray         []byte
 	numBits          uint
 	numHashFunctions uint
 	fpp              float64
@@ -28,7 +28,7 @@ func New(expectedInsertions uint, fpp float64, hashSeed uint) (*BloomFilter, err
 	k := optimalNumOfHashFunctions(fpp)
 	return &BloomFilter{
 		mut:              &sync.Mutex{},
-		bitArray:         make([]uint, m),
+		bitArray:         make([]byte, m),
 		numBits:          m,
 		numHashFunctions: k,
 		fpp:              fpp,
