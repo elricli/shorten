@@ -50,21 +50,18 @@ func (s *Server) RegisterHandler() http.Handler {
 		http.ServeFile(w, r, s.staticPath+"/img/favicon.ico")
 	})
 	mux.HandleFunc("/api/shorten", s.shorten)
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.staticPath))))
 	mux.HandleFunc("/", s.errorWrap(func(w http.ResponseWriter, r *http.Request) error {
 		path := r.URL.Path
 		switch path {
 		case "/":
 			http.ServeFile(w, r, s.staticPath+"/html/index.html")
 		default:
-			if strings.HasPrefix(r.URL.Path, "/static") {
-				http.StripPrefix("/static/", http.FileServer(http.Dir("content/static"))).ServeHTTP(w, r)
-			} else {
-				url, err := Get(r.Context(), strings.Trim(path, "/"), s.redisClient, s.bloomFilter)
-				if err != nil || url == "" {
-					return ErrLinkNotExist
-				}
-				http.Redirect(w, r, url, http.StatusMovedPermanently)
+			url, err := Get(r.Context(), strings.Trim(path, "/"), s.redisClient, s.bloomFilter)
+			if err != nil || url == "" {
+				return ErrLinkNotExist
 			}
+			http.Redirect(w, r, url, http.StatusMovedPermanently)
 		}
 		return nil
 	}))
