@@ -1,0 +1,18 @@
+domain: http://127.0.0.1
+
+redis:
+  addr: 127.0.0.1:6379
+  password: 
+  db: 0
+
+database:
+  user: postgres
+  password: password
+  host: 127.0.0.1
+  port: 5432
+  name: shorten-db
+
+bloom_filter:
+  expected_insertions: 10000000
+  fpp: 0.00001
+  hash_seed: 0x1

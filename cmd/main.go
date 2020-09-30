@@ -4,53 +4,41 @@ import (
 	"context"
 	"flag"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/drrrMikado/shorten/internal/bloomfilter"
 	"github.com/drrrMikado/shorten/internal/config"
-	"github.com/drrrMikado/shorten/internal/database"
-	"github.com/drrrMikado/shorten/internal/middleware"
-	"github.com/drrrMikado/shorten/internal/shorten"
+	"github.com/drrrMikado/shorten/server"
+	"github.com/drrrMikado/shorten/service"
+	_ "github.com/lib/pq"
 )
 
 var (
 	staticPath string
+	configFile string
 )
 
 func init() {
 	flag.StringVar(&staticPath, "static", "content/static", "static file path")
+	flag.StringVar(&configFile, "config", "config.yml", "config file path")
 	log.SetFlags(log.Ldate | log.Lshortfile | log.Lmicroseconds)
 }
 
 func main() {
 	flag.Parse()
 	ctx := context.Background()
-	cfg, err := config.Init()
+	cfg, err := config.Init(configFile)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	_ = cfg.Dump(os.Stdout)
-	redisClient, err := database.NewRedisClient(ctx, cfg.Redis)
+	svc, err := service.New(ctx, cfg)
 	if err != nil {
-		log.Fatalf("unable to new redis client: %v\n", err)
+		log.Fatal(err)
 	}
-	bf, err := bloomfilter.New(cfg.BloomFilter.ExpectedInsertions, cfg.BloomFilter.FPP, cfg.BloomFilter.HashSeed)
-	if err != nil {
-		log.Fatalf("bloomfilter.New: %v\n", err)
-	}
-	server := shorten.NewServer(cfg, shorten.ServerConfig{
-		RedisClient: redisClient,
-		BloomFilter: bf,
-		StaticPath:  staticPath,
-	})
-	mw := middleware.Chain(
-		middleware.AcceptRequests(http.MethodGet, http.MethodPost),
-	)
-	handler := server.RegisterHandler()
-	go log.Fatalln(http.ListenAndServe(":8080", mw.Use(handler)))
+	defer svc.Close()
+	server.Serve(staticPath, svc)
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Kill, os.Interrupt)
 	for {
@@ -59,7 +47,6 @@ func main() {
 		switch s {
 		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
 			log.Println("exit")
-			_ = redisClient.Close()
 			return
 		case syscall.SIGHUP:
 		default:

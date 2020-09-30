@@ -5,90 +5,53 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
+	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Config is all config struct.
 type Config struct {
-	Domain      string
-	Redis       Redis
-	BloomFilter BloomFilter
+	Domain      string      `yaml:"domain"`
+	Redis       Redis       `yaml:"redis"`
+	BloomFilter BloomFilter `yaml:"bloom_filter"`
+	Database    Database    `yaml:"database"`
 }
 
 // Redis config.
 type Redis struct {
-	Addr     string
-	Password string `json:"-"`
-	DB       int
+	Addr     string `yaml:"addr"`
+	Password string `yaml:"password" json:"-"`
+	DB       int    `yaml:"db"`
+}
+
+// Database config.
+type Database struct {
+	User     string `yaml:"user"`
+	Password string `yaml:"password" json:"-"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Name     string `yaml:"name"`
 }
 
 // BloomFilter config.
 type BloomFilter struct {
-	ExpectedInsertions uint
-	FPP                float64
-	HashSeed           uint
+	ExpectedInsertions uint    `yaml:"expected_insertions"`
+	FPP                float64 `yaml:"fpp"`
+	HashSeed           uint    `yaml:"hash_seed"`
 }
 
 // Init config content.
-func Init() (*Config, error) {
-	return &Config{
-		Domain: GetEnv("SHORTEN_DOMAIN", "http://localhost"),
-		Redis: Redis{
-			Addr:     GetEnv("SHORTEN_REDIS_ADDR", "localhost:6379"),
-			Password: GetEnv("SHORTEN_REDIS_PASSWORD", ""),
-			DB:       GetEnvInt("SHORTEN_REDIS_DB", 0),
-		},
-		BloomFilter: BloomFilter{
-			ExpectedInsertions: GetEnvUint("SHORTEN_BLOOM_FILTER_EXPECTED_INSERTIONS", 1e7),
-			FPP:                GetEnvFloat64("SHORTEN_BLOOM_FILTER_FPP", 0.00001),
-			HashSeed:           GetEnvUint("SHORTEN_BLOOM_FILTER_HASH_SEED", 0x1),
-		},
-	}, nil
-}
-
-// GetEnv looks up the given key from the environment, returning its value if
-// it exists, and otherwise returning the given fallback value.
-func GetEnv(key, fallback string) string {
-	if v, ok := os.LookupEnv(key); ok {
-		return v
+func Init(filename string) (*Config, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
 	}
-	return fallback
-}
-
-// GetEnvInt looks up the given key from the environment and expects an integer,
-// returning the integer value if it exists, and otherwise returning the given
-// fallback value.
-func GetEnvInt(key string, fallback int) int {
-	if valueStr, ok := os.LookupEnv(key); ok {
-		if v, err := strconv.Atoi(valueStr); err == nil {
-			return v
-		}
+	cfg := &Config{}
+	if err := yaml.NewDecoder(f).Decode(cfg); err != nil {
+		return nil, err
 	}
-	return fallback
-}
-
-// GetEnvUint looks up the given key from the environment and expects an
-// unsigned integer, returning the integer value if it exists,
-// and otherwise returning the given fallback value.
-func GetEnvUint(key string, fallback uint) uint {
-	if valueStr, ok := os.LookupEnv(key); ok {
-		if v, err := strconv.ParseUint(valueStr, 10, 64); err == nil {
-			return uint(v)
-		}
-	}
-	return fallback
-}
-
-// GetEnvFloat64 looks up the given key from the environment and expects a
-// float64, returning the float64 value if it exists, and otherwise returning
-// the given fallback value.
-func GetEnvFloat64(key string, fallback float64) float64 {
-	if valueStr, ok := os.LookupEnv(key); ok {
-		if value, err := strconv.ParseFloat(valueStr, 64); err == nil {
-			return value
-		}
-	}
-	return fallback
+	return cfg, nil
 }
 
 // Dump outputs the current config information to the given Writer.
@@ -99,4 +62,11 @@ func (c *Config) Dump(w io.Writer) error {
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "    ")
 	return enc.Encode(c)
+}
+
+// DBConnInfo returns a PostgreSQL connection string.
+func (c *Config) DBConnInfo() string {
+	timeoutOption := fmt.Sprintf("-c statement_timeout=%d", 10*time.Minute/time.Millisecond)
+	return fmt.Sprintf("user='%s' password='%s' host='%s' port=%s dbname='%s' sslmode=disable options='%s'",
+		c.Database.User, c.Database.Password, c.Database.Host, c.Database.Port, c.Database.Name, timeoutOption)
 }

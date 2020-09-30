@@ -17,5 +17,6 @@ WORKDIR /root/
 COPY --from=0 /app/shorten .
 COPY --from=0 /app/data .
 COPY --from=0 /app/content ./content
+COPY --from=0 /app/config.yml .
 
 CMD ["./shorten"]

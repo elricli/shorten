@@ -4,28 +4,9 @@ Fast generate short url and redirection.
 
 ## Deployment
 
-1. Using `docker`:
-
-   > Note: Once docker restart, the redis's data will be lost.
-
-   1. Copy `docker-compose.sample.yml` and rename to `docker-compose.yml`.
-   2. Modify environment in `docker-compose.yml`.
-   3. Run `docker-compose up`.
-
-2. Build
-
-   1. Set the following environment variables
-
-      - `SHORTEN_REDIS_ADDR` (default: localhost:6379)
-      - `SHORTEN_REDIS_PASSWORD` (default: '')
-      - `SHORTEN_DOMAIN` (default: localhost)
-      - `SHORTEN_BLOOM_FILTER_EXPECTED_INSERTIONS` (default: 1e7)
-      - `SHORTEN_BLOOM_FILTER_FPP` (default: 0.00001)
-      - `SHORTEN_BLOOM_FILTER_HASH_SEED` (default: 0x1)
-
-      See `internal/config/config.go` for details.
-
-   2. Build binary file and run it.
+1. Rename `config.sample.yml` to `config.yml`.
+2. Complete `config.yml`.
+3. Run it with `docker` or `golang`.
 
 ## Key Features
 
