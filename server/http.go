@@ -13,8 +13,8 @@ var (
 	staticPath string
 )
 
-// Serve server.
-func Serve(path string, s *service.Service) {
+// HTTPServe server.
+func HTTPServe(path string, s *service.Service) {
 	svc = s
 	staticPath = path
 	mux := http.NewServeMux()

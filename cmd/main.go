@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer svc.Close()
-	server.Serve(staticPath, svc)
+	server.HTTPServe(staticPath, svc)
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Kill, os.Interrupt)
 	for {

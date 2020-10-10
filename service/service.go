@@ -6,15 +6,16 @@ import (
 
 	"github.com/drrrMikado/shorten/internal/config"
 	"github.com/drrrMikado/shorten/internal/database"
+	"github.com/drrrMikado/shorten/internal/generator"
 	"github.com/go-redis/redis/v8"
 )
 
 // Service struct.
 type Service struct {
-	c   *config.Config
-	rdb *redis.Client
-	// bf  *bloomfilter.BloomFilter
-	db *sql.DB
+	c        *config.Config
+	rdb      *redis.Client
+	db       *sql.DB
+	idWorker *generator.IDWorker
 }
 
 // New service.
@@ -29,22 +30,11 @@ func New(ctx context.Context, cfg *config.Config) (*Service, error) {
 		return nil, err
 	}
 	s := &Service{
-		c:   cfg,
-		rdb: redis,
-		db:  db,
+		c:        cfg,
+		rdb:      redis,
+		db:       db,
+		idWorker: generator.NewIDWorker(1, 1),
 	}
-	// // set bloom filter
-	// s.bf, err = bloomfilter.New(cfg.BloomFilter.ExpectedInsertions, cfg.BloomFilter.FPP, cfg.BloomFilter.HashSeed)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// result, err := s.rdb.HGetAll(context.Background(), redisHashTableKey).Result()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// for k := range result {
-	// 	s.bf.Insert([]byte(k))
-	// }
 	return s, nil
 }
 
