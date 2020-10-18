@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/drrrMikado/shorten/service"
+	"github.com/drrrMikado/shorten/internal/service"
 )
 
 var (

@@ -20,7 +20,7 @@ type Service struct {
 
 // New service.
 func New(ctx context.Context, cfg *config.Config) (*Service, error) {
-	redis, err := database.NewRedisClient(ctx, cfg.Redis)
+	redisClient, err := database.NewRedisClient(ctx, cfg.Redis)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func New(ctx context.Context, cfg *config.Config) (*Service, error) {
 	}
 	s := &Service{
 		c:        cfg,
-		rdb:      redis,
+		rdb:      redisClient,
 		db:       db,
 		idWorker: generator.NewIDWorker(1, 1),
 	}
@@ -40,6 +40,6 @@ func New(ctx context.Context, cfg *config.Config) (*Service, error) {
 
 // Close service.
 func (s *Service) Close() {
-	s.rdb.Close()
-	s.db.Close()
+	_ = s.rdb.Close()
+	_ = s.db.Close()
 }

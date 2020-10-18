@@ -9,8 +9,8 @@ import (
 	"syscall"
 
 	"github.com/drrrMikado/shorten/internal/config"
-	"github.com/drrrMikado/shorten/server"
-	"github.com/drrrMikado/shorten/service"
+	"github.com/drrrMikado/shorten/internal/server"
+	"github.com/drrrMikado/shorten/internal/service"
 	_ "github.com/lib/pq"
 )
 
