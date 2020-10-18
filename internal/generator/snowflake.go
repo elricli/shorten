@@ -25,8 +25,8 @@ func NewIDWorker(workerID, sequence int64) *IDWorker {
 		workerIDBits       int64 = 5
 		maxWorkerID        int64 = -1 ^ (-1 << workerIDBits)
 		sequenceBits       int64 = 5 // Don't need too large sequence
-		workerIDShift      int64 = sequenceBits
-		timestampLeftShift int64 = sequenceBits + workerIDBits
+		workerIDShift            = sequenceBits
+		timestampLeftShift       = sequenceBits + workerIDBits
 		sequenceMask       int64 = -1 ^ (-1 << sequenceBits)
 	)
 	w := &IDWorker{
@@ -48,7 +48,7 @@ func NewIDWorker(workerID, sequence int64) *IDWorker {
 func (worker *IDWorker) NextID() (int64, error) {
 	timestamp := timeGen()
 	if timestamp < worker.lastTimestamp {
-		return 0, fmt.Errorf("Clock moved backwards. Refusing to generate id for %d milliseconds", worker.lastTimestamp-timestamp)
+		return 0, fmt.Errorf("clock moved backwards. Refusing to generate id for %d milliseconds", worker.lastTimestamp-timestamp)
 	}
 
 	if worker.lastTimestamp == timestamp {
