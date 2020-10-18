@@ -17,6 +17,7 @@ type BloomFilter struct {
 	fpp              float64
 	hashSeed         uint
 	NumUsed          uint
+	digest           hash.Murmur3
 }
 
 // New return a bloomFilter struct. fpp is probability of false positives
@@ -33,6 +34,7 @@ func New(expectedInsertions uint, fpp float64, hashSeed uint) (*BloomFilter, err
 		numHashFunctions: k,
 		fpp:              fpp,
 		hashSeed:         hashSeed,
+		digest:           hash.NewMurmur3(hashSeed),
 	}, nil
 }
 
@@ -42,7 +44,7 @@ func (bf *BloomFilter) Insert(key []byte) {
 	defer bf.mut.Unlock()
 	var h uint
 	for i := uint(0); i < bf.numHashFunctions; i++ {
-		h |= hash.Murmur3_32(key, bf.hashSeed)
+		h |= bf.digest.Sum32(key)
 		bitPos := h % bf.numBits
 		bf.bitArray[bitPos] |= 1
 	}
@@ -55,7 +57,7 @@ func (bf *BloomFilter) MightContain(key []byte) bool {
 	defer bf.mut.Unlock()
 	var h uint
 	for i := uint(0); i < bf.numHashFunctions; i++ {
-		h |= hash.Murmur3_32(key, bf.hashSeed)
+		h |= bf.digest.Sum32(key)
 		bitPos := h % bf.numBits
 		if bf.bitArray[bitPos] == 0 {
 			return false
