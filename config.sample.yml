@@ -11,8 +11,3 @@ database:
   host: 127.0.0.1
   port: 5432
   name: shorten-db
-
-bloom_filter:
-  expected_insertions: 10000000
-  fpp: 0.00001
-  hash_seed: 0x1

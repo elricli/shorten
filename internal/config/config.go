@@ -12,10 +12,9 @@ import (
 
 // Config is all config struct.
 type Config struct {
-	Domain      string      `yaml:"domain"`
-	Redis       Redis       `yaml:"redis"`
-	BloomFilter BloomFilter `yaml:"bloom_filter"`
-	Database    Database    `yaml:"database"`
+	Domain   string   `yaml:"domain"`
+	Redis    Redis    `yaml:"redis"`
+	Database Database `yaml:"database"`
 }
 
 // Redis config.
@@ -32,13 +31,6 @@ type Database struct {
 	Host     string `yaml:"host"`
 	Port     string `yaml:"port"`
 	Name     string `yaml:"name"`
-}
-
-// BloomFilter config.
-type BloomFilter struct {
-	ExpectedInsertions uint    `yaml:"expected_insertions"`
-	FPP                float64 `yaml:"fpp"`
-	HashSeed           uint    `yaml:"hash_seed"`
 }
 
 // Init config content.
