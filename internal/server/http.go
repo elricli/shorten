@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"github.com/drrrMikado/shorten/internal/middleware"
 	"github.com/drrrMikado/shorten/internal/service"
 )
 
@@ -18,13 +19,14 @@ func HTTPServe(path string, s *service.Service) {
 	svc = s
 	staticPath = path
 	mux := http.NewServeMux()
+	mw := middleware.Chain(middleware.AcceptRequests(http.MethodGet, http.MethodPost))
 	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, staticPath+"/img/favicon.ico")
 	})
 	mux.HandleFunc("/api/shorten", shorten)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(staticPath))))
 	mux.HandleFunc("/", errorWrap(defaultHandler))
-	go log.Fatalln(http.ListenAndServe(":8080", mux))
+	go log.Fatalln(http.ListenAndServe(":8080", mw(mux)))
 }
 
 func errorWrap(f func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
