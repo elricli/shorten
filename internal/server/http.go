@@ -19,7 +19,10 @@ func HTTPServe(path string, s *service.Service) {
 	svc = s
 	staticPath = path
 	mux := http.NewServeMux()
-	mw := middleware.Chain(middleware.AcceptRequests(http.MethodGet, http.MethodPost))
+	mw := middleware.Chain(
+		middleware.AcceptRequests(http.MethodGet, http.MethodPost),
+		middleware.Limiter(1000, 1000),
+	)
 	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, staticPath+"/img/favicon.ico")
 	})
