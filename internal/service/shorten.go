@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/drrrMikado/shorten/ent"
 	"github.com/drrrMikado/shorten/ent/shorturl"
 	"github.com/drrrMikado/shorten/internal/encode"
 	"github.com/drrrMikado/shorten/internal/validator"
@@ -35,7 +34,7 @@ func (s *Service) Insert(ctx context.Context, rawurl string) (string, error) {
 		return "", err
 	}
 	// insert to db.
-	if _, err = s.entCli.ShortUrl.Create().
+	if _, err = s.sdb.Create().
 		SetKey(key).
 		SetShortURL(shortURL).
 		SetLongURL(rawurl).
@@ -54,12 +53,9 @@ func (s *Service) Get(ctx context.Context, key string) (string, error) {
 		return longURL, nil
 	}
 	// from db
-	if shortURL, err := s.entCli.ShortUrl.
-		Query().
-		Where(shorturl.KeyEQ(key)).
-		First(ctx); err != nil && !ent.IsNotFound(err) {
+	shortURL, err := s.sdb.Query().Where(shorturl.Key(key)).First(ctx)
+	if err != nil {
 		return "", err
-	} else {
-		return shortURL.LongURL, nil
 	}
+	return shortURL.LongURL, nil
 }

@@ -14,16 +14,17 @@ import (
 type Service struct {
 	c        *config.Config
 	rdb      *redis.Client
-	entCli   *ent.Client
+	db       *ent.Client
+	sdb      *ent.ShortUrlClient
 	idWorker *generator.IDWorker
 }
 
 // New service.
 func New(ctx context.Context, cfg *config.Config) (*Service, error) {
 	redisClient, err := database.NewRedis(ctx, cfg.Redis)
-	//if err != nil {
-	//	return nil, err
-	//}
+	if err != nil {
+		return nil, err
+	}
 	entCli, err := database.NewDB(ctx, cfg.DBConnInfo())
 	if err != nil {
 		return nil, err
@@ -31,7 +32,8 @@ func New(ctx context.Context, cfg *config.Config) (*Service, error) {
 	s := &Service{
 		c:        cfg,
 		rdb:      redisClient,
-		entCli:   entCli,
+		db:       entCli,
+		sdb:      entCli.ShortUrl,
 		idWorker: generator.NewIDWorker(1, 1),
 	}
 	return s, nil
@@ -40,5 +42,5 @@ func New(ctx context.Context, cfg *config.Config) (*Service, error) {
 // Close service.
 func (s *Service) Close() {
 	_ = s.rdb.Close()
-	_ = s.entCli.Close()
+	_ = s.db.Close()
 }
