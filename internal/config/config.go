@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
 
 	"gopkg.in/yaml.v2"
 )
@@ -56,9 +55,8 @@ func (c *Config) Dump(w io.Writer) error {
 	return enc.Encode(c)
 }
 
-// DBConnInfo returns a PostgreSQL connection string.
+// DBConnInfo returns a DB connection string.
 func (c *Config) DBConnInfo() string {
-	timeoutOption := fmt.Sprintf("-c statement_timeout=%d", 10*time.Minute/time.Millisecond)
-	return fmt.Sprintf("user='%s' password='%s' host='%s' port=%s dbname='%s' sslmode=disable options='%s'",
-		c.Database.User, c.Database.Password, c.Database.Host, c.Database.Port, c.Database.Name, timeoutOption)
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?timeout=5s&readTimeout=5s&writeTimeout=1s&parseTime=true&loc=Local&charset=utf8mb4,utf8",
+		c.Database.User, c.Database.Password, c.Database.Host, c.Database.Port, c.Database.Name)
 }

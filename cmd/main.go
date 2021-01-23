@@ -11,7 +11,7 @@ import (
 	"github.com/drrrMikado/shorten/internal/config"
 	"github.com/drrrMikado/shorten/internal/server"
 	"github.com/drrrMikado/shorten/internal/service"
-	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (

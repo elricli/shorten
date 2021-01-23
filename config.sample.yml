@@ -1,4 +1,4 @@
-domain: http://127.0.0.1
+domain: http://example.com
 
 redis:
   addr: 127.0.0.1:6379
@@ -6,8 +6,8 @@ redis:
   db: 0
 
 database:
-  user: postgres
+  user: user
   password: password
   host: 127.0.0.1
-  port: 5432
-  name: shorten-db
+  port: 3306
+  name: shorten

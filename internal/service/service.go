@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"database/sql"
 
+	"github.com/drrrMikado/shorten/ent"
 	"github.com/drrrMikado/shorten/internal/config"
 	"github.com/drrrMikado/shorten/internal/database"
 	"github.com/drrrMikado/shorten/internal/generator"
@@ -14,25 +14,24 @@ import (
 type Service struct {
 	c        *config.Config
 	rdb      *redis.Client
-	db       *sql.DB
+	entCli   *ent.Client
 	idWorker *generator.IDWorker
 }
 
 // New service.
 func New(ctx context.Context, cfg *config.Config) (*Service, error) {
-	redisClient, err := database.NewRedisClient(ctx, cfg.Redis)
-	if err != nil {
-		return nil, err
-	}
-	dsn := cfg.DBConnInfo()
-	db, err := database.NewPostgres(ctx, dsn)
+	redisClient, err := database.NewRedis(ctx, cfg.Redis)
+	//if err != nil {
+	//	return nil, err
+	//}
+	entCli, err := database.NewDB(ctx, cfg.DBConnInfo())
 	if err != nil {
 		return nil, err
 	}
 	s := &Service{
 		c:        cfg,
 		rdb:      redisClient,
-		db:       db,
+		entCli:   entCli,
 		idWorker: generator.NewIDWorker(1, 1),
 	}
 	return s, nil
@@ -41,5 +40,5 @@ func New(ctx context.Context, cfg *config.Config) (*Service, error) {
 // Close service.
 func (s *Service) Close() {
 	_ = s.rdb.Close()
-	_ = s.db.Close()
+	_ = s.entCli.Close()
 }
