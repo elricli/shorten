@@ -28,7 +28,7 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 		u.Scheme = "http"
 		rawurl = u.String()
 	}
-	shortUrl, err := s.Svc.ShortUrl.Shorten(ctx, rawurl)
+	shortUrl, err := s.svc.ShortUrl.Shorten(ctx, rawurl)
 	if err != nil {
 		_ = errResp(w, err)
 		return
@@ -47,7 +47,7 @@ func (s *Server) defaultHandler(w http.ResponseWriter, r *http.Request) error {
 	case "/":
 		http.ServeFile(w, r, s.staticPath+"/html/index.html")
 	default:
-		shortUrl, err := s.Svc.ShortUrl.Get(r.Context(), strings.Trim(path, "/"))
+		shortUrl, err := s.svc.ShortUrl.Get(r.Context(), strings.Trim(path, "/"))
 		if err != nil || shortUrl.LongUrl == "" {
 			return ErrLinkNotExist
 		}

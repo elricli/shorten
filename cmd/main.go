@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/drrrMikado/shorten/pkg/rate"
 	"log"
 	"os"
 	"os/signal"
@@ -21,7 +22,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	server, cf, err := InitServer(staticPath)
+	server, cf, err := InitServer(staticPath, rate.NewLimiter(100, 100))
 	if err != nil {
 		log.Fatalln(err)
 	}

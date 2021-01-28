@@ -14,14 +14,16 @@ import (
 
 type Server struct {
 	srv        *http.Server
-	Svc        *service.Service
+	svc        *service.Service
+	limiter    *rate.Limiter
 	staticPath string
 }
 
-func NewServer(svc *service.Service, staticPath string) (*Server, func()) {
+func NewServer(svc *service.Service, staticPath string, limiter *rate.Limiter) (*Server, func()) {
 	s := &Server{
-		Svc:        svc,
+		svc:        svc,
 		staticPath: staticPath,
+		limiter:    limiter,
 	}
 	s.srv = &http.Server{
 		Addr:    ":8080",
@@ -53,10 +55,9 @@ func (s *Server) start() {
 // HTTPServe server.
 func (s *Server) initRouter() http.Handler {
 	mux := http.NewServeMux()
-	l := rate.NewLimiter(1000, 1000)
 	mw := middleware.Chain(
 		middleware.AcceptRequests(http.MethodGet, http.MethodPost),
-		middleware.Limiter(l),
+		middleware.Limiter(s.limiter),
 	)
 	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, s.staticPath+"/img/favicon.ico")
