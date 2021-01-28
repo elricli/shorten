@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/drrrMikado/shorten/ent/predicate"
-	"github.com/drrrMikado/shorten/ent/shorturl"
+	"github.com/drrrMikado/shorten/internal/repo/ent/predicate"
+	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"

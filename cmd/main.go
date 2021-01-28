@@ -20,7 +20,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&staticPath, "static", "content/static", "static file path")
+	flag.StringVar(&staticPath, "static", "public/static", "static file path")
 	flag.StringVar(&configFile, "config", "config.yml", "config file path")
 	log.SetFlags(log.Ldate | log.Lshortfile | log.Lmicroseconds)
 }

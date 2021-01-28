@@ -5,9 +5,9 @@ package enttest
 import (
 	"context"
 
-	"github.com/drrrMikado/shorten/ent"
+	"github.com/drrrMikado/shorten/internal/repo/ent"
 	// required by schema hooks.
-	_ "github.com/drrrMikado/shorten/ent/runtime"
+	_ "github.com/drrrMikado/shorten/internal/repo/ent/runtime"
 
 	"github.com/facebook/ent/dialect/sql/schema"
 )

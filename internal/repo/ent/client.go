@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/drrrMikado/shorten/ent/migrate"
+	"github.com/drrrMikado/shorten/internal/repo/ent/migrate"
 
-	"github.com/drrrMikado/shorten/ent/shorturl"
+	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
 
 	"github.com/facebook/ent/dialect"
 	"github.com/facebook/ent/dialect/sql"

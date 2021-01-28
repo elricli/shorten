@@ -32,7 +32,7 @@ type Database struct {
 	Name     string `yaml:"name"`
 }
 
-// Init config content.
+// Init config public.
 func Init(filename string) (*Config, error) {
 	f, err := os.Open(filename)
 	if err != nil {

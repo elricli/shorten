@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/drrrMikado/shorten/ent"
+	"github.com/drrrMikado/shorten/internal/repo/ent"
 )
 
 // The ShortUrlFunc type is an adapter to allow the use of ordinary

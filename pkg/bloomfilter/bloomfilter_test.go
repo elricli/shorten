@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/drrrMikado/shorten/internal/fastrand"
+	"github.com/drrrMikado/shorten/pkg/fastrand"
 )
 
 var (

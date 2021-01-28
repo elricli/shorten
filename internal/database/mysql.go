@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/drrrMikado/shorten/ent"
+	"github.com/drrrMikado/shorten/internal/repo/ent"
 	"github.com/facebook/ent/dialect"
 )
 

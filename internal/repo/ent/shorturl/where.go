@@ -5,7 +5,7 @@ package shorturl
 import (
 	"time"
 
-	"github.com/drrrMikado/shorten/ent/predicate"
+	"github.com/drrrMikado/shorten/internal/repo/ent/predicate"
 	"github.com/facebook/ent/dialect/sql"
 )
 

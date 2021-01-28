@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/drrrMikado/shorten/pkg/rate"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -19,9 +20,10 @@ func HTTPServe(path string, s *service.Service) {
 	svc = s
 	staticPath = path
 	mux := http.NewServeMux()
+	l := rate.NewLimiter(1000, 1000)
 	mw := middleware.Chain(
 		middleware.AcceptRequests(http.MethodGet, http.MethodPost),
-		middleware.Limiter(1000, 1000),
+		middleware.Limiter(l),
 	)
 	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, staticPath+"/img/favicon.ico")

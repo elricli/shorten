@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/drrrMikado/shorten/ent/shorturl"
-	"github.com/drrrMikado/shorten/internal/encode"
-	"github.com/drrrMikado/shorten/internal/validator"
+	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
+	"github.com/drrrMikado/shorten/pkg/encode"
+	"github.com/drrrMikado/shorten/pkg/validator"
 )
 
 var (

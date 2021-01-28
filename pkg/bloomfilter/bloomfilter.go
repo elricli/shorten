@@ -5,7 +5,7 @@ import (
 	"math"
 	"sync"
 
-	"github.com/drrrMikado/shorten/internal/hash"
+	"github.com/drrrMikado/shorten/pkg/hash"
 )
 
 // BloomFilter .

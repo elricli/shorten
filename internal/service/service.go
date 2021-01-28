@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 
-	"github.com/drrrMikado/shorten/ent"
 	"github.com/drrrMikado/shorten/internal/config"
 	"github.com/drrrMikado/shorten/internal/database"
-	"github.com/drrrMikado/shorten/internal/generator"
+	"github.com/drrrMikado/shorten/internal/repo/ent"
+	"github.com/drrrMikado/shorten/pkg/generator"
 	"github.com/go-redis/redis/v8"
 )
 

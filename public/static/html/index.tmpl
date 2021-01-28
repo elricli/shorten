@@ -1,0 +1,35 @@
+<!DOCTYPE html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shorten</title>
+    <!-- <link href="https://fonts.googleapis.com/css?family=Work+Sans:600|Roboto:400,500,700|Source+Code+Pro"
+        rel="stylesheet" /> -->
+    <link href="/static/css/shorten.css" rel="stylesheet" />
+    <script src="/static/js/shorten.js"></script>
+</head>
+
+<body>
+    <aside></aside>
+    <main class="site-content">
+        <div class="homepage">
+            <img class="homepage-logo" src="/static/img/gopher-homepage.jpg" alt="" />
+            <form id="shortenForm" class="shorten-form" action="/" method="POST">
+                <div class="shorten-button-group">
+                    <input type="text" name="url" id="shortenURLInput" role="textbox" placeholder="Shorten your link"
+                        autocapitalize="off" autocomplete="off" spellcheck="false" autofocus="true" />
+                    <button type="submit" id="shortenSubmitButton" class="shorten-button"
+                        value="Shorten">Shorten</button>
+                    <button type="submit" id="shortenCopyButton" class="shorten-button"
+                        style="display: none;">Copy</button>
+                </div>
+                <div class="error-msg" id="errorMsg"></div>
+            </form>
+    </main>
+    <footer></footer>
+</body>
+
+</html>

@@ -5,8 +5,8 @@ package ent
 import (
 	"time"
 
-	"github.com/drrrMikado/shorten/ent/schema"
-	"github.com/drrrMikado/shorten/ent/shorturl"
+	"github.com/drrrMikado/shorten/internal/repo/ent/schema"
+	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
 )
 
 // The init function reads all schema descriptors with runtime code
