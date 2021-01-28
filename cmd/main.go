@@ -1,44 +1,32 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/drrrMikado/shorten/internal/config"
-	"github.com/drrrMikado/shorten/internal/server"
-	"github.com/drrrMikado/shorten/internal/service"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
 	staticPath string
-	configFile string
 )
 
 func init() {
 	flag.StringVar(&staticPath, "static", "public/static", "static file path")
-	flag.StringVar(&configFile, "config", "config.yml", "config file path")
 	log.SetFlags(log.Ldate | log.Lshortfile | log.Lmicroseconds)
 }
 
 func main() {
 	flag.Parse()
-	ctx := context.Background()
-	cfg, err := config.Init(configFile)
+	server, cf, err := InitServer(staticPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	_ = cfg.Dump(os.Stdout)
-	svc, err := service.New(ctx, cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer svc.Close()
-	server.HTTPServe(staticPath, svc)
+	server.Serve()
+
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Kill, os.Interrupt)
 	for {
@@ -47,6 +35,7 @@ func main() {
 		switch s {
 		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
 			log.Println("exit")
+			cf()
 			return
 		case syscall.SIGHUP:
 		default:
