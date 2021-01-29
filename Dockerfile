@@ -2,21 +2,15 @@ FROM golang:latest
 
 WORKDIR /app
 
-ENV GO111MODULE=on
-ENV GOPROXY=http://goproxy.cn,direct
-
 COPY . .
 
-RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-w -s' -o shorten cmd/main.go
+RUN GOPROXY=http://goproxy.cn,direct CGO_ENABLED=0 GOOS=linux go build -ldflags '-w -s' -o shorten cmd/main.go cmd/wire_gen.go
 
 FROM scratch
 
 WORKDIR /root/
 
 COPY --from=0 /app/shorten .
-COPY --from=0 /app/data .
-COPY --from=0 /app/content ./content
-COPY --from=0 /app/config.yml .
+COPY --from=0 /app/public ./public
 
 CMD ["./shorten"]
