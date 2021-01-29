@@ -1,9 +1,10 @@
 package limiter
 
 import (
+	"net/http"
+
 	"github.com/drrrMikado/shorten/pkg/middleware"
 	"github.com/drrrMikado/shorten/pkg/rate"
-	"net/http"
 )
 
 func Limiter(l *rate.Limiter) middleware.Middleware {

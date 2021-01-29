@@ -11,10 +11,6 @@ import (
 	"github.com/drrrMikado/shorten/internal/service"
 )
 
-import (
-	_ "github.com/go-sql-driver/mysql"
-)
-
 // Injectors from wire.go:
 
 func InitServer(opts ...server.Option) (*server.Server, func(), error) {

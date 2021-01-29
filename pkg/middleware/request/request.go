@@ -1,8 +1,9 @@
 package request
 
 import (
-	"github.com/drrrMikado/shorten/pkg/middleware"
 	"net/http"
+
+	"github.com/drrrMikado/shorten/pkg/middleware"
 )
 
 const maxURILength = 5000

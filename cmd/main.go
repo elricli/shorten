@@ -2,19 +2,18 @@ package main
 
 import (
 	"flag"
-	"github.com/drrrMikado/shorten/internal/server"
-	"github.com/drrrMikado/shorten/pkg/middleware"
-	"github.com/drrrMikado/shorten/pkg/middleware/limiter"
-	"github.com/drrrMikado/shorten/pkg/middleware/recovery"
-	"github.com/drrrMikado/shorten/pkg/middleware/request"
-	"github.com/drrrMikado/shorten/pkg/rate"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/drrrMikado/shorten/internal/server"
+	"github.com/drrrMikado/shorten/pkg/middleware"
+	"github.com/drrrMikado/shorten/pkg/middleware/limiter"
+	"github.com/drrrMikado/shorten/pkg/middleware/recovery"
+	"github.com/drrrMikado/shorten/pkg/middleware/request"
+	"github.com/drrrMikado/shorten/pkg/rate"
 )
 
 var (

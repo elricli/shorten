@@ -3,9 +3,10 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"github.com/drrrMikado/shorten/pkg/validator"
 	"net/http"
 	"net/url"
+
+	"github.com/drrrMikado/shorten/pkg/validator"
 )
 
 var (

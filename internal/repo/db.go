@@ -2,11 +2,14 @@ package repo
 
 import (
 	"context"
+	"os"
+
 	"github.com/drrrMikado/shorten/internal/repo/ent"
 	"github.com/drrrMikado/shorten/internal/service/shorturl"
 	"github.com/facebook/ent/dialect"
 	"github.com/google/wire"
-	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var Set = wire.NewSet(

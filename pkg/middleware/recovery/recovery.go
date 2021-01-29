@@ -1,10 +1,11 @@
 package recovery
 
 import (
-	"github.com/drrrMikado/shorten/pkg/middleware"
 	"log"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/drrrMikado/shorten/pkg/middleware"
 )
 
 func Recovery() middleware.Middleware {
