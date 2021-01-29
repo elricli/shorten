@@ -28,6 +28,7 @@ func init() {
 func main() {
 	flag.Parse()
 	srv, cf, err := InitServer(
+		server.Network("tcp"),
 		server.Address(":8080"),
 		server.StaticPath(staticPath),
 		server.Middleware(middleware.Chain(
@@ -39,7 +40,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	srv.Serve()
+	srv.Listen()
 
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Kill, os.Interrupt)
