@@ -33,7 +33,9 @@ type ShortUrlMutation struct {
 	typ           string
 	id            *int
 	key           *string
-	long_url      *string
+	url           *string
+	pv            *uint64
+	addpv         *uint64
 	create_at     *time.Time
 	update_at     *time.Time
 	clearedFields map[string]struct{}
@@ -157,40 +159,110 @@ func (m *ShortUrlMutation) ResetKey() {
 	m.key = nil
 }
 
-// SetLongURL sets the "long_url" field.
-func (m *ShortUrlMutation) SetLongURL(s string) {
-	m.long_url = &s
+// SetURL sets the "url" field.
+func (m *ShortUrlMutation) SetURL(s string) {
+	m.url = &s
 }
 
-// LongURL returns the value of the "long_url" field in the mutation.
-func (m *ShortUrlMutation) LongURL() (r string, exists bool) {
-	v := m.long_url
+// URL returns the value of the "url" field in the mutation.
+func (m *ShortUrlMutation) URL() (r string, exists bool) {
+	v := m.url
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldLongURL returns the old "long_url" field's value of the ShortUrl entity.
+// OldURL returns the old "url" field's value of the ShortUrl entity.
 // If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShortUrlMutation) OldLongURL(ctx context.Context) (v string, err error) {
+func (m *ShortUrlMutation) OldURL(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldLongURL is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldURL is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldLongURL requires an ID field in the mutation")
+		return v, fmt.Errorf("OldURL requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLongURL: %w", err)
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
 	}
-	return oldValue.LongURL, nil
+	return oldValue.URL, nil
 }
 
-// ResetLongURL resets all changes to the "long_url" field.
-func (m *ShortUrlMutation) ResetLongURL() {
-	m.long_url = nil
+// ResetURL resets all changes to the "url" field.
+func (m *ShortUrlMutation) ResetURL() {
+	m.url = nil
+}
+
+// SetPv sets the "pv" field.
+func (m *ShortUrlMutation) SetPv(u uint64) {
+	m.pv = &u
+	m.addpv = nil
+}
+
+// Pv returns the value of the "pv" field in the mutation.
+func (m *ShortUrlMutation) Pv() (r uint64, exists bool) {
+	v := m.pv
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPv returns the old "pv" field's value of the ShortUrl entity.
+// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ShortUrlMutation) OldPv(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPv is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPv requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPv: %w", err)
+	}
+	return oldValue.Pv, nil
+}
+
+// AddPv adds u to the "pv" field.
+func (m *ShortUrlMutation) AddPv(u uint64) {
+	if m.addpv != nil {
+		*m.addpv += u
+	} else {
+		m.addpv = &u
+	}
+}
+
+// AddedPv returns the value that was added to the "pv" field in this mutation.
+func (m *ShortUrlMutation) AddedPv() (r uint64, exists bool) {
+	v := m.addpv
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearPv clears the value of the "pv" field.
+func (m *ShortUrlMutation) ClearPv() {
+	m.pv = nil
+	m.addpv = nil
+	m.clearedFields[shorturl.FieldPv] = struct{}{}
+}
+
+// PvCleared returns if the "pv" field was cleared in this mutation.
+func (m *ShortUrlMutation) PvCleared() bool {
+	_, ok := m.clearedFields[shorturl.FieldPv]
+	return ok
+}
+
+// ResetPv resets all changes to the "pv" field.
+func (m *ShortUrlMutation) ResetPv() {
+	m.pv = nil
+	m.addpv = nil
+	delete(m.clearedFields, shorturl.FieldPv)
 }
 
 // SetCreateAt sets the "create_at" field.
@@ -279,12 +351,15 @@ func (m *ShortUrlMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ShortUrlMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.key != nil {
 		fields = append(fields, shorturl.FieldKey)
 	}
-	if m.long_url != nil {
-		fields = append(fields, shorturl.FieldLongURL)
+	if m.url != nil {
+		fields = append(fields, shorturl.FieldURL)
+	}
+	if m.pv != nil {
+		fields = append(fields, shorturl.FieldPv)
 	}
 	if m.create_at != nil {
 		fields = append(fields, shorturl.FieldCreateAt)
@@ -302,8 +377,10 @@ func (m *ShortUrlMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case shorturl.FieldKey:
 		return m.Key()
-	case shorturl.FieldLongURL:
-		return m.LongURL()
+	case shorturl.FieldURL:
+		return m.URL()
+	case shorturl.FieldPv:
+		return m.Pv()
 	case shorturl.FieldCreateAt:
 		return m.CreateAt()
 	case shorturl.FieldUpdateAt:
@@ -319,8 +396,10 @@ func (m *ShortUrlMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case shorturl.FieldKey:
 		return m.OldKey(ctx)
-	case shorturl.FieldLongURL:
-		return m.OldLongURL(ctx)
+	case shorturl.FieldURL:
+		return m.OldURL(ctx)
+	case shorturl.FieldPv:
+		return m.OldPv(ctx)
 	case shorturl.FieldCreateAt:
 		return m.OldCreateAt(ctx)
 	case shorturl.FieldUpdateAt:
@@ -341,12 +420,19 @@ func (m *ShortUrlMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetKey(v)
 		return nil
-	case shorturl.FieldLongURL:
+	case shorturl.FieldURL:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetLongURL(v)
+		m.SetURL(v)
+		return nil
+	case shorturl.FieldPv:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPv(v)
 		return nil
 	case shorturl.FieldCreateAt:
 		v, ok := value.(time.Time)
@@ -369,13 +455,21 @@ func (m *ShortUrlMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ShortUrlMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addpv != nil {
+		fields = append(fields, shorturl.FieldPv)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ShortUrlMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case shorturl.FieldPv:
+		return m.AddedPv()
+	}
 	return nil, false
 }
 
@@ -384,6 +478,13 @@ func (m *ShortUrlMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ShortUrlMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case shorturl.FieldPv:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPv(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ShortUrl numeric field %s", name)
 }
@@ -391,7 +492,11 @@ func (m *ShortUrlMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ShortUrlMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(shorturl.FieldPv) {
+		fields = append(fields, shorturl.FieldPv)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -404,6 +509,11 @@ func (m *ShortUrlMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ShortUrlMutation) ClearField(name string) error {
+	switch name {
+	case shorturl.FieldPv:
+		m.ClearPv()
+		return nil
+	}
 	return fmt.Errorf("unknown ShortUrl nullable field %s", name)
 }
 
@@ -414,8 +524,11 @@ func (m *ShortUrlMutation) ResetField(name string) error {
 	case shorturl.FieldKey:
 		m.ResetKey()
 		return nil
-	case shorturl.FieldLongURL:
-		m.ResetLongURL()
+	case shorturl.FieldURL:
+		m.ResetURL()
+		return nil
+	case shorturl.FieldPv:
+		m.ResetPv()
 		return nil
 	case shorturl.FieldCreateAt:
 		m.ResetCreateAt()

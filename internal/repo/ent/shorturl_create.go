@@ -34,16 +34,30 @@ func (suc *ShortUrlCreate) SetNillableKey(s *string) *ShortUrlCreate {
 	return suc
 }
 
-// SetLongURL sets the "long_url" field.
-func (suc *ShortUrlCreate) SetLongURL(s string) *ShortUrlCreate {
-	suc.mutation.SetLongURL(s)
+// SetURL sets the "url" field.
+func (suc *ShortUrlCreate) SetURL(s string) *ShortUrlCreate {
+	suc.mutation.SetURL(s)
 	return suc
 }
 
-// SetNillableLongURL sets the "long_url" field if the given value is not nil.
-func (suc *ShortUrlCreate) SetNillableLongURL(s *string) *ShortUrlCreate {
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (suc *ShortUrlCreate) SetNillableURL(s *string) *ShortUrlCreate {
 	if s != nil {
-		suc.SetLongURL(*s)
+		suc.SetURL(*s)
+	}
+	return suc
+}
+
+// SetPv sets the "pv" field.
+func (suc *ShortUrlCreate) SetPv(u uint64) *ShortUrlCreate {
+	suc.mutation.SetPv(u)
+	return suc
+}
+
+// SetNillablePv sets the "pv" field if the given value is not nil.
+func (suc *ShortUrlCreate) SetNillablePv(u *uint64) *ShortUrlCreate {
+	if u != nil {
+		suc.SetPv(*u)
 	}
 	return suc
 }
@@ -132,9 +146,13 @@ func (suc *ShortUrlCreate) defaults() {
 		v := shorturl.DefaultKey
 		suc.mutation.SetKey(v)
 	}
-	if _, ok := suc.mutation.LongURL(); !ok {
-		v := shorturl.DefaultLongURL
-		suc.mutation.SetLongURL(v)
+	if _, ok := suc.mutation.URL(); !ok {
+		v := shorturl.DefaultURL
+		suc.mutation.SetURL(v)
+	}
+	if _, ok := suc.mutation.Pv(); !ok {
+		v := shorturl.DefaultPv
+		suc.mutation.SetPv(v)
 	}
 	if _, ok := suc.mutation.CreateAt(); !ok {
 		v := shorturl.DefaultCreateAt()
@@ -156,12 +174,12 @@ func (suc *ShortUrlCreate) check() error {
 			return &ValidationError{Name: "key", err: fmt.Errorf("ent: validator failed for field \"key\": %w", err)}
 		}
 	}
-	if _, ok := suc.mutation.LongURL(); !ok {
-		return &ValidationError{Name: "long_url", err: errors.New("ent: missing required field \"long_url\"")}
+	if _, ok := suc.mutation.URL(); !ok {
+		return &ValidationError{Name: "url", err: errors.New("ent: missing required field \"url\"")}
 	}
-	if v, ok := suc.mutation.LongURL(); ok {
-		if err := shorturl.LongURLValidator(v); err != nil {
-			return &ValidationError{Name: "long_url", err: fmt.Errorf("ent: validator failed for field \"long_url\": %w", err)}
+	if v, ok := suc.mutation.URL(); ok {
+		if err := shorturl.URLValidator(v); err != nil {
+			return &ValidationError{Name: "url", err: fmt.Errorf("ent: validator failed for field \"url\": %w", err)}
 		}
 	}
 	if _, ok := suc.mutation.CreateAt(); !ok {
@@ -205,13 +223,21 @@ func (suc *ShortUrlCreate) createSpec() (*ShortUrl, *sqlgraph.CreateSpec) {
 		})
 		_node.Key = value
 	}
-	if value, ok := suc.mutation.LongURL(); ok {
+	if value, ok := suc.mutation.URL(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: shorturl.FieldLongURL,
+			Column: shorturl.FieldURL,
 		})
-		_node.LongURL = value
+		_node.URL = value
+	}
+	if value, ok := suc.mutation.Pv(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: shorturl.FieldPv,
+		})
+		_node.Pv = value
 	}
 	if value, ok := suc.mutation.CreateAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

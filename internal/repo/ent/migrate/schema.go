@@ -12,7 +12,8 @@ var (
 	ShortUrlsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "key", Type: field.TypeString, Default: ""},
-		{Name: "long_url", Type: field.TypeString, Default: ""},
+		{Name: "url", Type: field.TypeString, Default: ""},
+		{Name: "pv", Type: field.TypeUint64, Nullable: true},
 		{Name: "create_at", Type: field.TypeTime},
 		{Name: "update_at", Type: field.TypeTime},
 	}

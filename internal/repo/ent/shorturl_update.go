@@ -41,17 +41,44 @@ func (suu *ShortUrlUpdate) SetNillableKey(s *string) *ShortUrlUpdate {
 	return suu
 }
 
-// SetLongURL sets the "long_url" field.
-func (suu *ShortUrlUpdate) SetLongURL(s string) *ShortUrlUpdate {
-	suu.mutation.SetLongURL(s)
+// SetURL sets the "url" field.
+func (suu *ShortUrlUpdate) SetURL(s string) *ShortUrlUpdate {
+	suu.mutation.SetURL(s)
 	return suu
 }
 
-// SetNillableLongURL sets the "long_url" field if the given value is not nil.
-func (suu *ShortUrlUpdate) SetNillableLongURL(s *string) *ShortUrlUpdate {
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (suu *ShortUrlUpdate) SetNillableURL(s *string) *ShortUrlUpdate {
 	if s != nil {
-		suu.SetLongURL(*s)
+		suu.SetURL(*s)
 	}
+	return suu
+}
+
+// SetPv sets the "pv" field.
+func (suu *ShortUrlUpdate) SetPv(u uint64) *ShortUrlUpdate {
+	suu.mutation.ResetPv()
+	suu.mutation.SetPv(u)
+	return suu
+}
+
+// SetNillablePv sets the "pv" field if the given value is not nil.
+func (suu *ShortUrlUpdate) SetNillablePv(u *uint64) *ShortUrlUpdate {
+	if u != nil {
+		suu.SetPv(*u)
+	}
+	return suu
+}
+
+// AddPv adds u to the "pv" field.
+func (suu *ShortUrlUpdate) AddPv(u uint64) *ShortUrlUpdate {
+	suu.mutation.AddPv(u)
+	return suu
+}
+
+// ClearPv clears the value of the "pv" field.
+func (suu *ShortUrlUpdate) ClearPv() *ShortUrlUpdate {
+	suu.mutation.ClearPv()
 	return suu
 }
 
@@ -152,9 +179,9 @@ func (suu *ShortUrlUpdate) check() error {
 			return &ValidationError{Name: "key", err: fmt.Errorf("ent: validator failed for field \"key\": %w", err)}
 		}
 	}
-	if v, ok := suu.mutation.LongURL(); ok {
-		if err := shorturl.LongURLValidator(v); err != nil {
-			return &ValidationError{Name: "long_url", err: fmt.Errorf("ent: validator failed for field \"long_url\": %w", err)}
+	if v, ok := suu.mutation.URL(); ok {
+		if err := shorturl.URLValidator(v); err != nil {
+			return &ValidationError{Name: "url", err: fmt.Errorf("ent: validator failed for field \"url\": %w", err)}
 		}
 	}
 	return nil
@@ -185,11 +212,31 @@ func (suu *ShortUrlUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: shorturl.FieldKey,
 		})
 	}
-	if value, ok := suu.mutation.LongURL(); ok {
+	if value, ok := suu.mutation.URL(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: shorturl.FieldLongURL,
+			Column: shorturl.FieldURL,
+		})
+	}
+	if value, ok := suu.mutation.Pv(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: shorturl.FieldPv,
+		})
+	}
+	if value, ok := suu.mutation.AddedPv(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: shorturl.FieldPv,
+		})
+	}
+	if suu.mutation.PvCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Column: shorturl.FieldPv,
 		})
 	}
 	if value, ok := suu.mutation.CreateAt(); ok {
@@ -238,17 +285,44 @@ func (suuo *ShortUrlUpdateOne) SetNillableKey(s *string) *ShortUrlUpdateOne {
 	return suuo
 }
 
-// SetLongURL sets the "long_url" field.
-func (suuo *ShortUrlUpdateOne) SetLongURL(s string) *ShortUrlUpdateOne {
-	suuo.mutation.SetLongURL(s)
+// SetURL sets the "url" field.
+func (suuo *ShortUrlUpdateOne) SetURL(s string) *ShortUrlUpdateOne {
+	suuo.mutation.SetURL(s)
 	return suuo
 }
 
-// SetNillableLongURL sets the "long_url" field if the given value is not nil.
-func (suuo *ShortUrlUpdateOne) SetNillableLongURL(s *string) *ShortUrlUpdateOne {
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (suuo *ShortUrlUpdateOne) SetNillableURL(s *string) *ShortUrlUpdateOne {
 	if s != nil {
-		suuo.SetLongURL(*s)
+		suuo.SetURL(*s)
 	}
+	return suuo
+}
+
+// SetPv sets the "pv" field.
+func (suuo *ShortUrlUpdateOne) SetPv(u uint64) *ShortUrlUpdateOne {
+	suuo.mutation.ResetPv()
+	suuo.mutation.SetPv(u)
+	return suuo
+}
+
+// SetNillablePv sets the "pv" field if the given value is not nil.
+func (suuo *ShortUrlUpdateOne) SetNillablePv(u *uint64) *ShortUrlUpdateOne {
+	if u != nil {
+		suuo.SetPv(*u)
+	}
+	return suuo
+}
+
+// AddPv adds u to the "pv" field.
+func (suuo *ShortUrlUpdateOne) AddPv(u uint64) *ShortUrlUpdateOne {
+	suuo.mutation.AddPv(u)
+	return suuo
+}
+
+// ClearPv clears the value of the "pv" field.
+func (suuo *ShortUrlUpdateOne) ClearPv() *ShortUrlUpdateOne {
+	suuo.mutation.ClearPv()
 	return suuo
 }
 
@@ -349,9 +423,9 @@ func (suuo *ShortUrlUpdateOne) check() error {
 			return &ValidationError{Name: "key", err: fmt.Errorf("ent: validator failed for field \"key\": %w", err)}
 		}
 	}
-	if v, ok := suuo.mutation.LongURL(); ok {
-		if err := shorturl.LongURLValidator(v); err != nil {
-			return &ValidationError{Name: "long_url", err: fmt.Errorf("ent: validator failed for field \"long_url\": %w", err)}
+	if v, ok := suuo.mutation.URL(); ok {
+		if err := shorturl.URLValidator(v); err != nil {
+			return &ValidationError{Name: "url", err: fmt.Errorf("ent: validator failed for field \"url\": %w", err)}
 		}
 	}
 	return nil
@@ -380,11 +454,31 @@ func (suuo *ShortUrlUpdateOne) sqlSave(ctx context.Context) (_node *ShortUrl, er
 			Column: shorturl.FieldKey,
 		})
 	}
-	if value, ok := suuo.mutation.LongURL(); ok {
+	if value, ok := suuo.mutation.URL(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: shorturl.FieldLongURL,
+			Column: shorturl.FieldURL,
+		})
+	}
+	if value, ok := suuo.mutation.Pv(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: shorturl.FieldPv,
+		})
+	}
+	if value, ok := suuo.mutation.AddedPv(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: shorturl.FieldPv,
+		})
+	}
+	if suuo.mutation.PvCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Column: shorturl.FieldPv,
 		})
 	}
 	if value, ok := suuo.mutation.CreateAt(); ok {

@@ -16,7 +16,8 @@ type ShortUrl struct {
 func (ShortUrl) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("key").NotEmpty().Default(""),
-		field.String("long_url").NotEmpty().Default(""),
+		field.String("url").NotEmpty().Default(""),
+		field.Uint64("pv").Default(0).Optional(),
 		field.Time("create_at").Default(time.Now),
 		field.Time("update_at").Default(time.Now),
 	}

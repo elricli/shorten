@@ -13,8 +13,10 @@ const (
 	FieldID = "id"
 	// FieldKey holds the string denoting the key field in the database.
 	FieldKey = "key"
-	// FieldLongURL holds the string denoting the long_url field in the database.
-	FieldLongURL = "long_url"
+	// FieldURL holds the string denoting the url field in the database.
+	FieldURL = "url"
+	// FieldPv holds the string denoting the pv field in the database.
+	FieldPv = "pv"
 	// FieldCreateAt holds the string denoting the create_at field in the database.
 	FieldCreateAt = "create_at"
 	// FieldUpdateAt holds the string denoting the update_at field in the database.
@@ -28,7 +30,8 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldKey,
-	FieldLongURL,
+	FieldURL,
+	FieldPv,
 	FieldCreateAt,
 	FieldUpdateAt,
 }
@@ -48,10 +51,12 @@ var (
 	DefaultKey string
 	// KeyValidator is a validator for the "key" field. It is called by the builders before save.
 	KeyValidator func(string) error
-	// DefaultLongURL holds the default value on creation for the "long_url" field.
-	DefaultLongURL string
-	// LongURLValidator is a validator for the "long_url" field. It is called by the builders before save.
-	LongURLValidator func(string) error
+	// DefaultURL holds the default value on creation for the "url" field.
+	DefaultURL string
+	// URLValidator is a validator for the "url" field. It is called by the builders before save.
+	URLValidator func(string) error
+	// DefaultPv holds the default value on creation for the "pv" field.
+	DefaultPv uint64
 	// DefaultCreateAt holds the default value on creation for the "create_at" field.
 	DefaultCreateAt func() time.Time
 	// DefaultUpdateAt holds the default value on creation for the "update_at" field.

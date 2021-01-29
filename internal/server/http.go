@@ -73,12 +73,12 @@ func (s *Server) initHandler() {
 		case "/api/shorten":
 			s.shorten(w, r)
 		default:
-			shortUrl, err := s.svc.ShortUrl.Get(r.Context(), strings.Trim(path, "/"))
-			if err != nil || shortUrl.LongUrl == "" {
+			shortUrl, err := s.svc.ShortUrl.Redirect(r.Context(), strings.Trim(path, "/"))
+			if err != nil || shortUrl.URL == "" {
 				http.Error(w, ErrLinkNotExist.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, shortUrl.LongUrl, http.StatusMovedPermanently)
+			http.Redirect(w, r, shortUrl.URL, http.StatusMovedPermanently)
 		}
 		return
 	})

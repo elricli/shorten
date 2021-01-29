@@ -21,18 +21,22 @@ func init() {
 	shorturl.DefaultKey = shorturlDescKey.Default.(string)
 	// shorturl.KeyValidator is a validator for the "key" field. It is called by the builders before save.
 	shorturl.KeyValidator = shorturlDescKey.Validators[0].(func(string) error)
-	// shorturlDescLongURL is the schema descriptor for long_url field.
-	shorturlDescLongURL := shorturlFields[1].Descriptor()
-	// shorturl.DefaultLongURL holds the default value on creation for the long_url field.
-	shorturl.DefaultLongURL = shorturlDescLongURL.Default.(string)
-	// shorturl.LongURLValidator is a validator for the "long_url" field. It is called by the builders before save.
-	shorturl.LongURLValidator = shorturlDescLongURL.Validators[0].(func(string) error)
+	// shorturlDescURL is the schema descriptor for url field.
+	shorturlDescURL := shorturlFields[1].Descriptor()
+	// shorturl.DefaultURL holds the default value on creation for the url field.
+	shorturl.DefaultURL = shorturlDescURL.Default.(string)
+	// shorturl.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	shorturl.URLValidator = shorturlDescURL.Validators[0].(func(string) error)
+	// shorturlDescPv is the schema descriptor for pv field.
+	shorturlDescPv := shorturlFields[2].Descriptor()
+	// shorturl.DefaultPv holds the default value on creation for the pv field.
+	shorturl.DefaultPv = shorturlDescPv.Default.(uint64)
 	// shorturlDescCreateAt is the schema descriptor for create_at field.
-	shorturlDescCreateAt := shorturlFields[2].Descriptor()
+	shorturlDescCreateAt := shorturlFields[3].Descriptor()
 	// shorturl.DefaultCreateAt holds the default value on creation for the create_at field.
 	shorturl.DefaultCreateAt = shorturlDescCreateAt.Default.(func() time.Time)
 	// shorturlDescUpdateAt is the schema descriptor for update_at field.
-	shorturlDescUpdateAt := shorturlFields[3].Descriptor()
+	shorturlDescUpdateAt := shorturlFields[4].Descriptor()
 	// shorturl.DefaultUpdateAt holds the default value on creation for the update_at field.
 	shorturl.DefaultUpdateAt = shorturlDescUpdateAt.Default.(func() time.Time)
 }

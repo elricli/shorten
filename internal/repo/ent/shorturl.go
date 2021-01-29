@@ -18,8 +18,10 @@ type ShortUrl struct {
 	ID int `json:"id,omitempty"`
 	// Key holds the value of the "key" field.
 	Key string `json:"key,omitempty"`
-	// LongURL holds the value of the "long_url" field.
-	LongURL string `json:"long_url,omitempty"`
+	// URL holds the value of the "url" field.
+	URL string `json:"url,omitempty"`
+	// Pv holds the value of the "pv" field.
+	Pv uint64 `json:"pv,omitempty"`
 	// CreateAt holds the value of the "create_at" field.
 	CreateAt time.Time `json:"create_at,omitempty"`
 	// UpdateAt holds the value of the "update_at" field.
@@ -31,9 +33,9 @@ func (*ShortUrl) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case shorturl.FieldID:
+		case shorturl.FieldID, shorturl.FieldPv:
 			values[i] = &sql.NullInt64{}
-		case shorturl.FieldKey, shorturl.FieldLongURL:
+		case shorturl.FieldKey, shorturl.FieldURL:
 			values[i] = &sql.NullString{}
 		case shorturl.FieldCreateAt, shorturl.FieldUpdateAt:
 			values[i] = &sql.NullTime{}
@@ -64,11 +66,17 @@ func (su *ShortUrl) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				su.Key = value.String
 			}
-		case shorturl.FieldLongURL:
+		case shorturl.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field long_url", values[i])
+				return fmt.Errorf("unexpected type %T for field url", values[i])
 			} else if value.Valid {
-				su.LongURL = value.String
+				su.URL = value.String
+			}
+		case shorturl.FieldPv:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field pv", values[i])
+			} else if value.Valid {
+				su.Pv = uint64(value.Int64)
 			}
 		case shorturl.FieldCreateAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -112,8 +120,10 @@ func (su *ShortUrl) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", su.ID))
 	builder.WriteString(", key=")
 	builder.WriteString(su.Key)
-	builder.WriteString(", long_url=")
-	builder.WriteString(su.LongURL)
+	builder.WriteString(", url=")
+	builder.WriteString(su.URL)
+	builder.WriteString(", pv=")
+	builder.WriteString(fmt.Sprintf("%v", su.Pv))
 	builder.WriteString(", create_at=")
 	builder.WriteString(su.CreateAt.Format(time.ANSIC))
 	builder.WriteString(", update_at=")

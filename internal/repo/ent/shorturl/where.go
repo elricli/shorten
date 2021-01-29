@@ -99,10 +99,17 @@ func Key(v string) predicate.ShortUrl {
 	})
 }
 
-// LongURL applies equality check predicate on the "long_url" field. It's identical to LongURLEQ.
-func LongURL(v string) predicate.ShortUrl {
+// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
+func URL(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLongURL), v))
+		s.Where(sql.EQ(s.C(FieldURL), v))
+	})
+}
+
+// Pv applies equality check predicate on the "pv" field. It's identical to PvEQ.
+func Pv(v uint64) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPv), v))
 	})
 }
 
@@ -231,22 +238,22 @@ func KeyContainsFold(v string) predicate.ShortUrl {
 	})
 }
 
-// LongURLEQ applies the EQ predicate on the "long_url" field.
-func LongURLEQ(v string) predicate.ShortUrl {
+// URLEQ applies the EQ predicate on the "url" field.
+func URLEQ(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLongURL), v))
+		s.Where(sql.EQ(s.C(FieldURL), v))
 	})
 }
 
-// LongURLNEQ applies the NEQ predicate on the "long_url" field.
-func LongURLNEQ(v string) predicate.ShortUrl {
+// URLNEQ applies the NEQ predicate on the "url" field.
+func URLNEQ(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldLongURL), v))
+		s.Where(sql.NEQ(s.C(FieldURL), v))
 	})
 }
 
-// LongURLIn applies the In predicate on the "long_url" field.
-func LongURLIn(vs ...string) predicate.ShortUrl {
+// URLIn applies the In predicate on the "url" field.
+func URLIn(vs ...string) predicate.ShortUrl {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -258,12 +265,12 @@ func LongURLIn(vs ...string) predicate.ShortUrl {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldLongURL), v...))
+		s.Where(sql.In(s.C(FieldURL), v...))
 	})
 }
 
-// LongURLNotIn applies the NotIn predicate on the "long_url" field.
-func LongURLNotIn(vs ...string) predicate.ShortUrl {
+// URLNotIn applies the NotIn predicate on the "url" field.
+func URLNotIn(vs ...string) predicate.ShortUrl {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -275,70 +282,160 @@ func LongURLNotIn(vs ...string) predicate.ShortUrl {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldLongURL), v...))
+		s.Where(sql.NotIn(s.C(FieldURL), v...))
 	})
 }
 
-// LongURLGT applies the GT predicate on the "long_url" field.
-func LongURLGT(v string) predicate.ShortUrl {
+// URLGT applies the GT predicate on the "url" field.
+func URLGT(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldLongURL), v))
+		s.Where(sql.GT(s.C(FieldURL), v))
 	})
 }
 
-// LongURLGTE applies the GTE predicate on the "long_url" field.
-func LongURLGTE(v string) predicate.ShortUrl {
+// URLGTE applies the GTE predicate on the "url" field.
+func URLGTE(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldLongURL), v))
+		s.Where(sql.GTE(s.C(FieldURL), v))
 	})
 }
 
-// LongURLLT applies the LT predicate on the "long_url" field.
-func LongURLLT(v string) predicate.ShortUrl {
+// URLLT applies the LT predicate on the "url" field.
+func URLLT(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldLongURL), v))
+		s.Where(sql.LT(s.C(FieldURL), v))
 	})
 }
 
-// LongURLLTE applies the LTE predicate on the "long_url" field.
-func LongURLLTE(v string) predicate.ShortUrl {
+// URLLTE applies the LTE predicate on the "url" field.
+func URLLTE(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldLongURL), v))
+		s.Where(sql.LTE(s.C(FieldURL), v))
 	})
 }
 
-// LongURLContains applies the Contains predicate on the "long_url" field.
-func LongURLContains(v string) predicate.ShortUrl {
+// URLContains applies the Contains predicate on the "url" field.
+func URLContains(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldLongURL), v))
+		s.Where(sql.Contains(s.C(FieldURL), v))
 	})
 }
 
-// LongURLHasPrefix applies the HasPrefix predicate on the "long_url" field.
-func LongURLHasPrefix(v string) predicate.ShortUrl {
+// URLHasPrefix applies the HasPrefix predicate on the "url" field.
+func URLHasPrefix(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldLongURL), v))
+		s.Where(sql.HasPrefix(s.C(FieldURL), v))
 	})
 }
 
-// LongURLHasSuffix applies the HasSuffix predicate on the "long_url" field.
-func LongURLHasSuffix(v string) predicate.ShortUrl {
+// URLHasSuffix applies the HasSuffix predicate on the "url" field.
+func URLHasSuffix(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldLongURL), v))
+		s.Where(sql.HasSuffix(s.C(FieldURL), v))
 	})
 }
 
-// LongURLEqualFold applies the EqualFold predicate on the "long_url" field.
-func LongURLEqualFold(v string) predicate.ShortUrl {
+// URLEqualFold applies the EqualFold predicate on the "url" field.
+func URLEqualFold(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldLongURL), v))
+		s.Where(sql.EqualFold(s.C(FieldURL), v))
 	})
 }
 
-// LongURLContainsFold applies the ContainsFold predicate on the "long_url" field.
-func LongURLContainsFold(v string) predicate.ShortUrl {
+// URLContainsFold applies the ContainsFold predicate on the "url" field.
+func URLContainsFold(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldLongURL), v))
+		s.Where(sql.ContainsFold(s.C(FieldURL), v))
+	})
+}
+
+// PvEQ applies the EQ predicate on the "pv" field.
+func PvEQ(v uint64) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPv), v))
+	})
+}
+
+// PvNEQ applies the NEQ predicate on the "pv" field.
+func PvNEQ(v uint64) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPv), v))
+	})
+}
+
+// PvIn applies the In predicate on the "pv" field.
+func PvIn(vs ...uint64) predicate.ShortUrl {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldPv), v...))
+	})
+}
+
+// PvNotIn applies the NotIn predicate on the "pv" field.
+func PvNotIn(vs ...uint64) predicate.ShortUrl {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldPv), v...))
+	})
+}
+
+// PvGT applies the GT predicate on the "pv" field.
+func PvGT(v uint64) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPv), v))
+	})
+}
+
+// PvGTE applies the GTE predicate on the "pv" field.
+func PvGTE(v uint64) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPv), v))
+	})
+}
+
+// PvLT applies the LT predicate on the "pv" field.
+func PvLT(v uint64) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPv), v))
+	})
+}
+
+// PvLTE applies the LTE predicate on the "pv" field.
+func PvLTE(v uint64) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPv), v))
+	})
+}
+
+// PvIsNil applies the IsNil predicate on the "pv" field.
+func PvIsNil() predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPv)))
+	})
+}
+
+// PvNotNil applies the NotNil predicate on the "pv" field.
+func PvNotNil() predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPv)))
 	})
 }
 
