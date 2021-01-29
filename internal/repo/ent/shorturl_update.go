@@ -41,20 +41,6 @@ func (suu *ShortUrlUpdate) SetNillableKey(s *string) *ShortUrlUpdate {
 	return suu
 }
 
-// SetShortURL sets the "short_url" field.
-func (suu *ShortUrlUpdate) SetShortURL(s string) *ShortUrlUpdate {
-	suu.mutation.SetShortURL(s)
-	return suu
-}
-
-// SetNillableShortURL sets the "short_url" field if the given value is not nil.
-func (suu *ShortUrlUpdate) SetNillableShortURL(s *string) *ShortUrlUpdate {
-	if s != nil {
-		suu.SetShortURL(*s)
-	}
-	return suu
-}
-
 // SetLongURL sets the "long_url" field.
 func (suu *ShortUrlUpdate) SetLongURL(s string) *ShortUrlUpdate {
 	suu.mutation.SetLongURL(s)
@@ -166,11 +152,6 @@ func (suu *ShortUrlUpdate) check() error {
 			return &ValidationError{Name: "key", err: fmt.Errorf("ent: validator failed for field \"key\": %w", err)}
 		}
 	}
-	if v, ok := suu.mutation.ShortURL(); ok {
-		if err := shorturl.ShortURLValidator(v); err != nil {
-			return &ValidationError{Name: "short_url", err: fmt.Errorf("ent: validator failed for field \"short_url\": %w", err)}
-		}
-	}
 	if v, ok := suu.mutation.LongURL(); ok {
 		if err := shorturl.LongURLValidator(v); err != nil {
 			return &ValidationError{Name: "long_url", err: fmt.Errorf("ent: validator failed for field \"long_url\": %w", err)}
@@ -202,13 +183,6 @@ func (suu *ShortUrlUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeString,
 			Value:  value,
 			Column: shorturl.FieldKey,
-		})
-	}
-	if value, ok := suu.mutation.ShortURL(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: shorturl.FieldShortURL,
 		})
 	}
 	if value, ok := suu.mutation.LongURL(); ok {
@@ -260,20 +234,6 @@ func (suuo *ShortUrlUpdateOne) SetKey(s string) *ShortUrlUpdateOne {
 func (suuo *ShortUrlUpdateOne) SetNillableKey(s *string) *ShortUrlUpdateOne {
 	if s != nil {
 		suuo.SetKey(*s)
-	}
-	return suuo
-}
-
-// SetShortURL sets the "short_url" field.
-func (suuo *ShortUrlUpdateOne) SetShortURL(s string) *ShortUrlUpdateOne {
-	suuo.mutation.SetShortURL(s)
-	return suuo
-}
-
-// SetNillableShortURL sets the "short_url" field if the given value is not nil.
-func (suuo *ShortUrlUpdateOne) SetNillableShortURL(s *string) *ShortUrlUpdateOne {
-	if s != nil {
-		suuo.SetShortURL(*s)
 	}
 	return suuo
 }
@@ -389,11 +349,6 @@ func (suuo *ShortUrlUpdateOne) check() error {
 			return &ValidationError{Name: "key", err: fmt.Errorf("ent: validator failed for field \"key\": %w", err)}
 		}
 	}
-	if v, ok := suuo.mutation.ShortURL(); ok {
-		if err := shorturl.ShortURLValidator(v); err != nil {
-			return &ValidationError{Name: "short_url", err: fmt.Errorf("ent: validator failed for field \"short_url\": %w", err)}
-		}
-	}
 	if v, ok := suuo.mutation.LongURL(); ok {
 		if err := shorturl.LongURLValidator(v); err != nil {
 			return &ValidationError{Name: "long_url", err: fmt.Errorf("ent: validator failed for field \"long_url\": %w", err)}
@@ -423,13 +378,6 @@ func (suuo *ShortUrlUpdateOne) sqlSave(ctx context.Context) (_node *ShortUrl, er
 			Type:   field.TypeString,
 			Value:  value,
 			Column: shorturl.FieldKey,
-		})
-	}
-	if value, ok := suuo.mutation.ShortURL(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: shorturl.FieldShortURL,
 		})
 	}
 	if value, ok := suuo.mutation.LongURL(); ok {

@@ -5,9 +5,8 @@ import (
 )
 
 type ShortUrl struct {
-	Key      string
-	ShortUrl string
-	LongUrl  string
+	Key     string
+	LongUrl string
 }
 
 type Service interface {

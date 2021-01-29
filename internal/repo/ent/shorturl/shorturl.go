@@ -13,8 +13,6 @@ const (
 	FieldID = "id"
 	// FieldKey holds the string denoting the key field in the database.
 	FieldKey = "key"
-	// FieldShortURL holds the string denoting the short_url field in the database.
-	FieldShortURL = "short_url"
 	// FieldLongURL holds the string denoting the long_url field in the database.
 	FieldLongURL = "long_url"
 	// FieldCreateAt holds the string denoting the create_at field in the database.
@@ -30,7 +28,6 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldKey,
-	FieldShortURL,
 	FieldLongURL,
 	FieldCreateAt,
 	FieldUpdateAt,
@@ -51,10 +48,6 @@ var (
 	DefaultKey string
 	// KeyValidator is a validator for the "key" field. It is called by the builders before save.
 	KeyValidator func(string) error
-	// DefaultShortURL holds the default value on creation for the "short_url" field.
-	DefaultShortURL string
-	// ShortURLValidator is a validator for the "short_url" field. It is called by the builders before save.
-	ShortURLValidator func(string) error
 	// DefaultLongURL holds the default value on creation for the "long_url" field.
 	DefaultLongURL string
 	// LongURLValidator is a validator for the "long_url" field. It is called by the builders before save.

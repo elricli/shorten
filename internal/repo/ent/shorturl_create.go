@@ -34,20 +34,6 @@ func (suc *ShortUrlCreate) SetNillableKey(s *string) *ShortUrlCreate {
 	return suc
 }
 
-// SetShortURL sets the "short_url" field.
-func (suc *ShortUrlCreate) SetShortURL(s string) *ShortUrlCreate {
-	suc.mutation.SetShortURL(s)
-	return suc
-}
-
-// SetNillableShortURL sets the "short_url" field if the given value is not nil.
-func (suc *ShortUrlCreate) SetNillableShortURL(s *string) *ShortUrlCreate {
-	if s != nil {
-		suc.SetShortURL(*s)
-	}
-	return suc
-}
-
 // SetLongURL sets the "long_url" field.
 func (suc *ShortUrlCreate) SetLongURL(s string) *ShortUrlCreate {
 	suc.mutation.SetLongURL(s)
@@ -146,10 +132,6 @@ func (suc *ShortUrlCreate) defaults() {
 		v := shorturl.DefaultKey
 		suc.mutation.SetKey(v)
 	}
-	if _, ok := suc.mutation.ShortURL(); !ok {
-		v := shorturl.DefaultShortURL
-		suc.mutation.SetShortURL(v)
-	}
 	if _, ok := suc.mutation.LongURL(); !ok {
 		v := shorturl.DefaultLongURL
 		suc.mutation.SetLongURL(v)
@@ -172,14 +154,6 @@ func (suc *ShortUrlCreate) check() error {
 	if v, ok := suc.mutation.Key(); ok {
 		if err := shorturl.KeyValidator(v); err != nil {
 			return &ValidationError{Name: "key", err: fmt.Errorf("ent: validator failed for field \"key\": %w", err)}
-		}
-	}
-	if _, ok := suc.mutation.ShortURL(); !ok {
-		return &ValidationError{Name: "short_url", err: errors.New("ent: missing required field \"short_url\"")}
-	}
-	if v, ok := suc.mutation.ShortURL(); ok {
-		if err := shorturl.ShortURLValidator(v); err != nil {
-			return &ValidationError{Name: "short_url", err: fmt.Errorf("ent: validator failed for field \"short_url\": %w", err)}
 		}
 	}
 	if _, ok := suc.mutation.LongURL(); !ok {
@@ -230,14 +204,6 @@ func (suc *ShortUrlCreate) createSpec() (*ShortUrl, *sqlgraph.CreateSpec) {
 			Column: shorturl.FieldKey,
 		})
 		_node.Key = value
-	}
-	if value, ok := suc.mutation.ShortURL(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: shorturl.FieldShortURL,
-		})
-		_node.ShortURL = value
 	}
 	if value, ok := suc.mutation.LongURL(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

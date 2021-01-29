@@ -25,9 +25,8 @@ func (s *service) Shorten(ctx context.Context, longUrl string) (*ShortUrl, error
 		return nil, err
 	}
 	shortUrl := &ShortUrl{
-		Key:      encode.ToBase62(uint64(nextID)),
-		ShortUrl: "fake",
-		LongUrl:  longUrl,
+		Key:     encode.ToBase62(uint64(nextID)),
+		LongUrl: longUrl,
 	}
 	err = s.repo.Create(ctx, shortUrl)
 	return shortUrl, err

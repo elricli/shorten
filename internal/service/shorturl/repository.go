@@ -20,7 +20,6 @@ func NewRepository(c *ent.Client) Repository {
 func (r *repository) Create(ctx context.Context, record *ShortUrl) error {
 	_, err := r.c.Create().
 		SetKey(record.Key).
-		SetShortURL(record.ShortUrl).
 		SetLongURL(record.LongUrl).
 		Save(ctx)
 	if err != nil {
@@ -35,8 +34,7 @@ func (r *repository) Get(ctx context.Context, key string) (*ShortUrl, error) {
 		return nil, err
 	}
 	return &ShortUrl{
-		Key:      shortUrl.Key,
-		ShortUrl: shortUrl.ShortURL,
-		LongUrl:  shortUrl.LongURL,
+		Key:     shortUrl.Key,
+		LongUrl: shortUrl.LongURL,
 	}, nil
 }

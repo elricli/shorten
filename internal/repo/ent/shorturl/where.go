@@ -99,13 +99,6 @@ func Key(v string) predicate.ShortUrl {
 	})
 }
 
-// ShortURL applies equality check predicate on the "short_url" field. It's identical to ShortURLEQ.
-func ShortURL(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldShortURL), v))
-	})
-}
-
 // LongURL applies equality check predicate on the "long_url" field. It's identical to LongURLEQ.
 func LongURL(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
@@ -235,117 +228,6 @@ func KeyEqualFold(v string) predicate.ShortUrl {
 func KeyContainsFold(v string) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldKey), v))
-	})
-}
-
-// ShortURLEQ applies the EQ predicate on the "short_url" field.
-func ShortURLEQ(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLNEQ applies the NEQ predicate on the "short_url" field.
-func ShortURLNEQ(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLIn applies the In predicate on the "short_url" field.
-func ShortURLIn(vs ...string) predicate.ShortUrl {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldShortURL), v...))
-	})
-}
-
-// ShortURLNotIn applies the NotIn predicate on the "short_url" field.
-func ShortURLNotIn(vs ...string) predicate.ShortUrl {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldShortURL), v...))
-	})
-}
-
-// ShortURLGT applies the GT predicate on the "short_url" field.
-func ShortURLGT(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLGTE applies the GTE predicate on the "short_url" field.
-func ShortURLGTE(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLLT applies the LT predicate on the "short_url" field.
-func ShortURLLT(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLLTE applies the LTE predicate on the "short_url" field.
-func ShortURLLTE(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLContains applies the Contains predicate on the "short_url" field.
-func ShortURLContains(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLHasPrefix applies the HasPrefix predicate on the "short_url" field.
-func ShortURLHasPrefix(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLHasSuffix applies the HasSuffix predicate on the "short_url" field.
-func ShortURLHasSuffix(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLEqualFold applies the EqualFold predicate on the "short_url" field.
-func ShortURLEqualFold(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldShortURL), v))
-	})
-}
-
-// ShortURLContainsFold applies the ContainsFold predicate on the "short_url" field.
-func ShortURLContainsFold(v string) predicate.ShortUrl {
-	return predicate.ShortUrl(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldShortURL), v))
 	})
 }
 

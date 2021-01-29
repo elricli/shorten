@@ -33,7 +33,6 @@ type ShortUrlMutation struct {
 	typ           string
 	id            *int
 	key           *string
-	short_url     *string
 	long_url      *string
 	create_at     *time.Time
 	update_at     *time.Time
@@ -158,42 +157,6 @@ func (m *ShortUrlMutation) ResetKey() {
 	m.key = nil
 }
 
-// SetShortURL sets the "short_url" field.
-func (m *ShortUrlMutation) SetShortURL(s string) {
-	m.short_url = &s
-}
-
-// ShortURL returns the value of the "short_url" field in the mutation.
-func (m *ShortUrlMutation) ShortURL() (r string, exists bool) {
-	v := m.short_url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldShortURL returns the old "short_url" field's value of the ShortUrl entity.
-// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShortUrlMutation) OldShortURL(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldShortURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldShortURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldShortURL: %w", err)
-	}
-	return oldValue.ShortURL, nil
-}
-
-// ResetShortURL resets all changes to the "short_url" field.
-func (m *ShortUrlMutation) ResetShortURL() {
-	m.short_url = nil
-}
-
 // SetLongURL sets the "long_url" field.
 func (m *ShortUrlMutation) SetLongURL(s string) {
 	m.long_url = &s
@@ -316,12 +279,9 @@ func (m *ShortUrlMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ShortUrlMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 4)
 	if m.key != nil {
 		fields = append(fields, shorturl.FieldKey)
-	}
-	if m.short_url != nil {
-		fields = append(fields, shorturl.FieldShortURL)
 	}
 	if m.long_url != nil {
 		fields = append(fields, shorturl.FieldLongURL)
@@ -342,8 +302,6 @@ func (m *ShortUrlMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case shorturl.FieldKey:
 		return m.Key()
-	case shorturl.FieldShortURL:
-		return m.ShortURL()
 	case shorturl.FieldLongURL:
 		return m.LongURL()
 	case shorturl.FieldCreateAt:
@@ -361,8 +319,6 @@ func (m *ShortUrlMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case shorturl.FieldKey:
 		return m.OldKey(ctx)
-	case shorturl.FieldShortURL:
-		return m.OldShortURL(ctx)
 	case shorturl.FieldLongURL:
 		return m.OldLongURL(ctx)
 	case shorturl.FieldCreateAt:
@@ -384,13 +340,6 @@ func (m *ShortUrlMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetKey(v)
-		return nil
-	case shorturl.FieldShortURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetShortURL(v)
 		return nil
 	case shorturl.FieldLongURL:
 		v, ok := value.(string)
@@ -464,9 +413,6 @@ func (m *ShortUrlMutation) ResetField(name string) error {
 	switch name {
 	case shorturl.FieldKey:
 		m.ResetKey()
-		return nil
-	case shorturl.FieldShortURL:
-		m.ResetShortURL()
 		return nil
 	case shorturl.FieldLongURL:
 		m.ResetLongURL()

@@ -18,8 +18,6 @@ type ShortUrl struct {
 	ID int `json:"id,omitempty"`
 	// Key holds the value of the "key" field.
 	Key string `json:"key,omitempty"`
-	// ShortURL holds the value of the "short_url" field.
-	ShortURL string `json:"short_url,omitempty"`
 	// LongURL holds the value of the "long_url" field.
 	LongURL string `json:"long_url,omitempty"`
 	// CreateAt holds the value of the "create_at" field.
@@ -35,7 +33,7 @@ func (*ShortUrl) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case shorturl.FieldID:
 			values[i] = &sql.NullInt64{}
-		case shorturl.FieldKey, shorturl.FieldShortURL, shorturl.FieldLongURL:
+		case shorturl.FieldKey, shorturl.FieldLongURL:
 			values[i] = &sql.NullString{}
 		case shorturl.FieldCreateAt, shorturl.FieldUpdateAt:
 			values[i] = &sql.NullTime{}
@@ -65,12 +63,6 @@ func (su *ShortUrl) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field key", values[i])
 			} else if value.Valid {
 				su.Key = value.String
-			}
-		case shorturl.FieldShortURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field short_url", values[i])
-			} else if value.Valid {
-				su.ShortURL = value.String
 			}
 		case shorturl.FieldLongURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -120,8 +112,6 @@ func (su *ShortUrl) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", su.ID))
 	builder.WriteString(", key=")
 	builder.WriteString(su.Key)
-	builder.WriteString(", short_url=")
-	builder.WriteString(su.ShortURL)
 	builder.WriteString(", long_url=")
 	builder.WriteString(su.LongURL)
 	builder.WriteString(", create_at=")
