@@ -9,7 +9,6 @@ import (
 	"github.com/drrrMikado/shorten/internal/repo"
 	"github.com/drrrMikado/shorten/internal/server"
 	"github.com/drrrMikado/shorten/internal/service"
-	"github.com/drrrMikado/shorten/pkg/rate"
 )
 
 import (
@@ -18,14 +17,14 @@ import (
 
 // Injectors from wire.go:
 
-func InitServer(staticPath2 string, limiter *rate.Limiter) (*server.Server, func(), error) {
+func InitServer(opts ...server.Option) (*server.Server, func(), error) {
 	repository, cleanup, err := repo.NewRepository()
 	if err != nil {
 		return nil, nil, err
 	}
 	shorturlRepository := repository.ShortUrl
 	serviceService := service.New(shorturlRepository)
-	serverServer, cleanup2 := server.NewServer(serviceService, staticPath2, limiter)
+	serverServer, cleanup2 := server.NewServer(serviceService, opts...)
 	return serverServer, func() {
 		cleanup2()
 		cleanup()

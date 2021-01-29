@@ -2,33 +2,33 @@ package server
 
 import (
 	"context"
-	"github.com/drrrMikado/shorten/pkg/rate"
 	"log"
 	"net/http"
-	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/drrrMikado/shorten/internal/service"
-	"github.com/drrrMikado/shorten/pkg/middleware"
 )
 
 type Server struct {
-	srv        *http.Server
-	svc        *service.Service
-	limiter    *rate.Limiter
-	staticPath string
+	*http.Server
+	svc *service.Service
+	opt option
 }
 
-func NewServer(svc *service.Service, staticPath string, limiter *rate.Limiter) (*Server, func()) {
+func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
+	opt := option{
+		staticPath: "public/static",
+		address:    ":8080",
+	}
+	for _, o := range opts {
+		o(&opt)
+	}
 	s := &Server{
-		svc:        svc,
-		staticPath: staticPath,
-		limiter:    limiter,
+		svc: svc,
+		opt: opt,
 	}
-	s.srv = &http.Server{
-		Addr:    ":8080",
-		Handler: s.initRouter(),
-	}
+	s.newRouter()
 	return s, s.stop
 }
 
@@ -39,45 +39,51 @@ func (s *Server) Serve() {
 func (s *Server) stop() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
-	if err := s.srv.Shutdown(ctx); err != nil {
+	if err := s.Shutdown(ctx); err != nil {
 		log.Println("Server forced to shutdown:", err)
 	}
 }
 
 func (s *Server) start() {
 	go func() {
-		if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalln(err)
 		}
 	}()
 }
 
-// HTTPServe server.
-func (s *Server) initRouter() http.Handler {
+func (s *Server) newRouter() {
 	mux := http.NewServeMux()
-	mw := middleware.Chain(
-		middleware.AcceptRequests(http.MethodGet, http.MethodPost),
-		middleware.Limiter(s.limiter),
-	)
-	mux.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, s.staticPath+"/img/favicon.ico")
-	})
+
 	mux.HandleFunc("/api/shorten", s.shorten)
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.staticPath))))
-	mux.HandleFunc("/", errorWrap(s.defaultHandler))
-	return mw(mux)
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.opt.staticPath))))
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+		switch path {
+		case "/favicon.ico":
+			http.ServeFile(w, r, s.GetStatic("/img/favicon.ico"))
+		case "/":
+			http.ServeFile(w, r, s.GetStatic("/html/index.html"))
+		case "/api/shorten":
+			s.shorten(w, r)
+		default:
+			shortUrl, err := s.svc.ShortUrl.Get(r.Context(), strings.Trim(path, "/"))
+			if err != nil || shortUrl.LongUrl == "" {
+				http.Error(w, ErrLinkNotExist.Error(), http.StatusInternalServerError)
+				return
+			}
+			http.Redirect(w, r, shortUrl.LongUrl, http.StatusMovedPermanently)
+		}
+		return
+	})
+
+	s.Handler = mux
+	if s.opt.middleware != nil {
+		s.Handler = s.opt.middleware(mux)
+	}
+	return
 }
 
-func errorWrap(f func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if err := recover(); err != nil {
-				log.Println(string(debug.Stack()))
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			}
-		}()
-		if err := f(w, r); err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
-	}
+func (s *Server) GetStatic(path string) string {
+	return s.opt.staticPath + path
 }

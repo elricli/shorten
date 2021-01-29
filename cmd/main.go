@@ -2,8 +2,14 @@ package main
 
 import (
 	"flag"
+	"github.com/drrrMikado/shorten/internal/server"
+	"github.com/drrrMikado/shorten/pkg/middleware"
+	"github.com/drrrMikado/shorten/pkg/middleware/limiter"
+	"github.com/drrrMikado/shorten/pkg/middleware/recovery"
+	"github.com/drrrMikado/shorten/pkg/middleware/request"
 	"github.com/drrrMikado/shorten/pkg/rate"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,11 +28,19 @@ func init() {
 
 func main() {
 	flag.Parse()
-	server, cf, err := InitServer(staticPath, rate.NewLimiter(100, 100))
+	srv, cf, err := InitServer(
+		server.Address(":8080"),
+		server.StaticPath(staticPath),
+		server.Middleware(middleware.Chain(
+			request.Accept(http.MethodGet, http.MethodPost),
+			limiter.Limiter(rate.NewLimiter(100, 100)),
+			recovery.Recovery(),
+		)),
+	)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	server.Serve()
+	srv.Serve()
 
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Kill, os.Interrupt)
@@ -35,7 +49,7 @@ func main() {
 		log.Println("get a signal", s.String())
 		switch s {
 		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-			log.Println("exit")
+			log.Println("Server shutting down...")
 			cf()
 			return
 		case syscall.SIGHUP:

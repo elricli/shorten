@@ -6,7 +6,6 @@ import (
 	"github.com/drrrMikado/shorten/pkg/validator"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 var (
@@ -39,21 +38,6 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 		"data":    shortUrl.Key,
 	})
 	return
-}
-
-func (s *Server) defaultHandler(w http.ResponseWriter, r *http.Request) error {
-	path := r.URL.Path
-	switch path {
-	case "/":
-		http.ServeFile(w, r, s.staticPath+"/html/index.html")
-	default:
-		shortUrl, err := s.svc.ShortUrl.Get(r.Context(), strings.Trim(path, "/"))
-		if err != nil || shortUrl.LongUrl == "" {
-			return ErrLinkNotExist
-		}
-		http.Redirect(w, r, shortUrl.LongUrl, http.StatusMovedPermanently)
-	}
-	return nil
 }
 
 func errResp(w http.ResponseWriter, err error) error {
