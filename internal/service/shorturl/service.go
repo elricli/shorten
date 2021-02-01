@@ -2,10 +2,10 @@ package shorturl
 
 import (
 	"context"
-	"log"
 
 	"github.com/drrrMikado/shorten/internal/idworker"
 	"github.com/drrrMikado/shorten/pkg/encode"
+	"github.com/drrrMikado/shorten/pkg/log"
 )
 
 type service struct {
@@ -21,6 +21,7 @@ func NewService(repo Repository) Service {
 func (s *service) Shorten(ctx context.Context, longUrl string) (*ShortUrl, error) {
 	id, err := idworker.Get()
 	if err != nil {
+		log.Errorw("Failed get id by id worker", "err", err)
 		return nil, err
 	}
 	shortUrl := &ShortUrl{
@@ -28,17 +29,32 @@ func (s *service) Shorten(ctx context.Context, longUrl string) (*ShortUrl, error
 		URL: longUrl,
 	}
 	err = s.repo.Create(ctx, shortUrl)
-	return shortUrl, err
+	if err != nil {
+		log.Errorw("Failed get by key",
+			"key", shortUrl.Key,
+			"url", shortUrl.URL,
+			"err", err,
+		)
+		return nil, err
+	}
+	return shortUrl, nil
 }
 
 func (s *service) Redirect(ctx context.Context, key string) (*ShortUrl, error) {
 	shortUrl, err := s.repo.Get(ctx, key)
 	if err != nil {
+		log.Errorw("Failed get by key",
+			"key", key,
+			"err", err,
+		)
 		return nil, err
 	}
 	go func() {
 		if err := s.repo.IncrPV(context.TODO(), shortUrl.ID); err != nil {
-			log.Printf("s.repo.IncrPV:%d, error:%v\n", shortUrl.ID, err)
+			log.Errorw("increase pv error",
+				"id", shortUrl.ID,
+				"err", err,
+			)
 		}
 	}()
 	return shortUrl, nil
