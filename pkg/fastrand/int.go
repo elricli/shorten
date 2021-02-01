@@ -30,7 +30,7 @@ func Uint32n(maxN uint32) uint32 {
 	return uint32((uint64(x) * uint64(maxN)) >> 32)
 }
 
-// PRNG is a pseudorandom number generator.
+// PRNG is a pseudorandom number snowflake.
 //
 // It is unsafe to call PRNG methods from concurrent goroutines.
 type PRNG struct {

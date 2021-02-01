@@ -1,4 +1,4 @@
-package generator
+package snowflake
 
 import (
 	"testing"
