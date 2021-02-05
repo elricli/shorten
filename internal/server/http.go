@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/drrrMikado/shorten/internal/service"
 )
 
@@ -36,6 +38,10 @@ func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
 
 func (s *Server) Listen() {
 	s.start()
+	// pprof
+	go func() {
+		log.Println(http.ListenAndServe(":6060", nil))
+	}()
 }
 
 func (s *Server) stop() {
