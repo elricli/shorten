@@ -3,7 +3,7 @@
 //go:generate wire
 //+build !wireinject
 
-package main
+package di
 
 import (
 	"github.com/drrrMikado/shorten/internal/repo"

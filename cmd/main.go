@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/drrrMikado/shorten/internal/di"
 	"github.com/drrrMikado/shorten/internal/server"
 	"github.com/drrrMikado/shorten/pkg/log"
 	"github.com/drrrMikado/shorten/pkg/middleware"
@@ -26,7 +27,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	srv, cf, err := InitServer(
+	srv, cf, err := di.InitServer(
 		server.Network("tcp"),
 		server.Address(":8080"),
 		server.StaticPath(staticPath),
