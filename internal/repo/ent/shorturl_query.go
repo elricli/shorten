@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 	"github.com/drrrMikado/shorten/internal/repo/ent/predicate"
 	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
-	"github.com/facebook/ent/dialect/sql"
-	"github.com/facebook/ent/dialect/sql/sqlgraph"
-	"github.com/facebook/ent/schema/field"
 )
 
 // ShortUrlQuery is the builder for querying ShortUrl entities.
@@ -261,7 +261,7 @@ func (suq *ShortUrlQuery) GroupBy(field string, fields ...string) *ShortUrlGroup
 		if err := suq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		return suq.sqlQuery(), nil
+		return suq.sqlQuery(ctx), nil
 	}
 	return group
 }
@@ -384,7 +384,7 @@ func (suq *ShortUrlQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (suq *ShortUrlQuery) sqlQuery() *sql.Selector {
+func (suq *ShortUrlQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(suq.driver.Dialect())
 	t1 := builder.Table(shorturl.Table)
 	selector := builder.Select(t1.Columns(shorturl.Columns...)...).From(t1)
@@ -679,7 +679,7 @@ func (sus *ShortUrlSelect) Scan(ctx context.Context, v interface{}) error {
 	if err := sus.prepareQuery(ctx); err != nil {
 		return err
 	}
-	sus.sql = sus.ShortUrlQuery.sqlQuery()
+	sus.sql = sus.ShortUrlQuery.sqlQuery(ctx)
 	return sus.sqlScan(ctx, v)
 }
 

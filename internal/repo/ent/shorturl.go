@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
-	"github.com/facebook/ent/dialect/sql"
 )
 
 // ShortUrl is the model entity for the ShortUrl schema.

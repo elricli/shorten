@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
+	"entgo.io/ent/dialect"
 	"github.com/drrrMikado/shorten/internal/repo/ent"
 	"github.com/drrrMikado/shorten/internal/service/shorturl"
-	"github.com/facebook/ent/dialect"
 	"github.com/google/wire"
 
 	_ "github.com/go-sql-driver/mysql"

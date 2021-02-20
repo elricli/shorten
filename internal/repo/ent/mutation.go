@@ -11,7 +11,7 @@ import (
 	"github.com/drrrMikado/shorten/internal/repo/ent/predicate"
 	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
 
-	"github.com/facebook/ent"
+	"entgo.io/ent"
 )
 
 const (

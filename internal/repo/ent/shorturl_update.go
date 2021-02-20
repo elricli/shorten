@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 	"github.com/drrrMikado/shorten/internal/repo/ent/predicate"
 	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
-	"github.com/facebook/ent/dialect/sql"
-	"github.com/facebook/ent/dialect/sql/sqlgraph"
-	"github.com/facebook/ent/schema/field"
 )
 
 // ShortUrlUpdate is the builder for updating ShortUrl entities.
@@ -447,6 +447,13 @@ func (suuo *ShortUrlUpdateOne) sqlSave(ctx context.Context) (_node *ShortUrl, er
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing ShortUrl.ID for update")}
 	}
 	_spec.Node.ID.Value = id
+	if ps := suuo.mutation.predicates; len(ps) > 0 {
+		_spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
 	if value, ok := suuo.mutation.Key(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
