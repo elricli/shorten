@@ -1,6 +1,6 @@
 module github.com/drrrMikado/shorten
 
-go 1.15
+go 1.16
 
 require (
 	github.com/facebook/ent v0.5.4
