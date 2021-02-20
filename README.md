@@ -2,11 +2,9 @@
 
 Fast generate short url and redirection.
 
-## Deployment
+## Requirement
 
-1. Rename `config.sample.yml` to `config.yml`.
-2. Complete `config.yml`.
-3. Run it with `docker` or `golang`.
+- Need to set `MYSQL_DSN` env.
 
 ## Key Features
 
