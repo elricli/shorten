@@ -9,7 +9,6 @@ type Option func(option *option)
 type option struct {
 	network    string
 	address    string
-	staticPath string
 	middleware middleware.Middleware
 }
 
@@ -24,13 +23,6 @@ func Network(network string) Option {
 func Address(addr string) Option {
 	return func(o *option) {
 		o.address = addr
-	}
-}
-
-// StaticPath with server static file path.
-func StaticPath(path string) Option {
-	return func(o *option) {
-		o.staticPath = path
 	}
 }
 

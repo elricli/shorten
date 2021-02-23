@@ -11,6 +11,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/drrrMikado/shorten/internal/service"
+	"github.com/drrrMikado/shorten/public/static"
 )
 
 type Server struct {
@@ -21,9 +22,8 @@ type Server struct {
 
 func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
 	opt := option{
-		network:    "tcp",
-		staticPath: "public/static",
-		address:    ":8080",
+		network: "tcp",
+		address: ":8080",
 	}
 	for _, o := range opts {
 		o(&opt)
@@ -67,15 +67,13 @@ func (s *Server) start() {
 func (s *Server) initHandler() {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/shorten", s.shorten)
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(s.opt.staticPath))))
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(static.FS))))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
 		switch path {
-		case "/favicon.ico":
-			http.ServeFile(w, r, s.GetStatic("/img/favicon.ico"))
 		case "/":
-			http.ServeFile(w, r, s.GetStatic("/html/index.html"))
+			b, _ := static.FS.ReadFile("html/index.html")
+			_, _ = w.Write(b)
 		case "/api/shorten":
 			s.shorten(w, r)
 		default:
@@ -96,8 +94,4 @@ func (s *Server) initHandler() {
 		s.Handler = s.opt.middleware(mux)
 	}
 	return
-}
-
-func (s *Server) GetStatic(path string) string {
-	return s.opt.staticPath + path
 }

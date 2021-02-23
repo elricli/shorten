@@ -17,20 +17,11 @@ import (
 	"github.com/drrrMikado/shorten/pkg/rate"
 )
 
-var (
-	staticPath string
-)
-
-func init() {
-	flag.StringVar(&staticPath, "static", "public/static", "static file path")
-}
-
 func main() {
 	flag.Parse()
 	srv, cf, err := di.InitServer(
 		server.Network("tcp"),
 		server.Address(":8080"),
-		server.StaticPath(staticPath),
 		server.Middleware(middleware.Chain(
 			request.Accept(http.MethodGet, http.MethodPost),
 			limiter.Limiter(rate.NewLimiter(100, 100)),
