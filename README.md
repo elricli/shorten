@@ -4,7 +4,7 @@ Fast generate short url and redirection.
 
 ## Requirement
 
-- Need to set `MYSQL_DSN` env.
+- Need to set `DATA_SOURCE_NAME` env.
 
 ## Key Features
 
