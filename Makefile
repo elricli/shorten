@@ -6,7 +6,7 @@ BUILD_FLAGS = $(TARGET)
 all:
 	go build $(BUILD_FLAGS)
 run:
-	./$(BINARY) -s
+	./$(BINARY)
 build:
 	CGO_ENABLED=0 GOOS=linux go build $(BUILD_FLAGS) cmd/main.go
 	docker build -t $(IMAGE):latest .
