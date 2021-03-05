@@ -5,7 +5,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -29,9 +28,6 @@ func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
 	opt := option{
 		network: "tcp",
 		address: _defaultAddr,
-	}
-	if addr := os.Getenv("SHORTEN_ADDR"); addr != "" {
-		opt.address = addr
 	}
 	for _, o := range opts {
 		o(&opt)

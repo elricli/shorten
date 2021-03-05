@@ -22,6 +22,9 @@ func Network(network string) Option {
 // Address with server address.
 func Address(addr string) Option {
 	return func(o *option) {
+		if addr == "" {
+			addr = _defaultAddr
+		}
 		o.address = addr
 	}
 }

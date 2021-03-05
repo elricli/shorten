@@ -21,7 +21,7 @@ func main() {
 	flag.Parse()
 	srv, cf, err := di.InitServer(
 		server.Network("tcp"),
-		server.Address(":8080"),
+		server.Address(os.Getenv("SHORTEN_ADDR")),
 		server.Middleware(middleware.Chain(
 			request.Accept(http.MethodGet, http.MethodPost),
 			limiter.Limiter(rate.NewLimiter(100, 100)),
