@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -20,10 +21,17 @@ type Server struct {
 	opt option
 }
 
+const (
+	_defaultAddr = ":8080"
+)
+
 func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
 	opt := option{
 		network: "tcp",
-		address: ":8080",
+		address: _defaultAddr,
+	}
+	if addr := os.Getenv("SHORTEN_ADDR"); addr != "" {
+		opt.address = addr
 	}
 	for _, o := range opts {
 		o(&opt)

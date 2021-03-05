@@ -25,7 +25,7 @@ type Repository struct {
 
 func NewRepository() (repo *Repository, cf func(), err error) {
 	var client *ent.Client
-	if client, err = ent.Open(dialect.Postgres, os.Getenv("DATA_SOURCE_NAME")); err != nil {
+	if client, err = ent.Open(dialect.Postgres, os.Getenv("SHORTEN_DSN")); err != nil {
 		return
 	}
 	cf = func() {
