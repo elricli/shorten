@@ -3,11 +3,10 @@ version: "3"
 services:
   shorten:
     image: shorten:latest
+    container_name: shorten
     environment:
       SHORTEN_DSN: ${SHORTEN_DSN:-"user='postgres' password='' host='db-host' port=5432 dbname='shorten' sslmode=disable options='-c statement_timeout=60000'"}
-      SHORTEN_ADDR: ":8080"
-    ports:
-      - 8081:8080
+      SHORTEN_ADDR: "shorten:80"
     restart: unless-stopped
     networks:
       - traefik_proxy
