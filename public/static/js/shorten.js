@@ -1,7 +1,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const { copyBtnElem, submitBtnElem, formElem, urlInputElem, errElem } = {
+    const {copyBtnElem, submitBtnElem, formElem, urlInputElem, errElem} = {
         copyBtnElem: document.getElementById("shortenCopyButton"),
         submitBtnElem: document.getElementById("shortenSubmitButton"),
         formElem: document.getElementById("shortenForm"),
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formElem.addEventListener("submit", (e) => {
         e.preventDefault();
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", '/api/shorten');
+        xhr.open("POST", 'api/shorten');
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhr.onload = () => {
             let resp = JSON.parse(xhr.responseText);
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             err("unable to copy");
             return;
         }
-        const { state } = navigator.permissions.query({
+        const {state} = navigator.permissions.query({
             name: "clipboard-write",
         });
         if (state == "denied") {
