@@ -2,9 +2,10 @@
 
 Fast generate short url and redirection.
 
-## Requirement
+## Env
 
-- Need to set `DATA_SOURCE_NAME` env.
+- `SHORTEN_DSN` Data source name
+- `SHORTEN_ADDR` Listening address
 
 ## Key Features
 
