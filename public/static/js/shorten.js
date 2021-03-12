@@ -26,25 +26,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     formElem.addEventListener("submit", (e) => {
         e.preventDefault();
+        let inputURL = new URL(urlInputElem.value);
+        let locationURL = new URL(window.location.href);
+        if (inputURL.hostname === locationURL.hostname) {
+            err("can't short this url.")
+            return
+        }
         let xhr = new XMLHttpRequest();
         xhr.open("POST", 'api/shorten');
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhr.onload = () => {
+            /**
+             * @param {number} resp.errcode - err code
+             * @param {string} resp.errmsg - err message
+             */
             let resp = JSON.parse(xhr.responseText);
-            if (xhr.status != 200) {
+            if (xhr.status !== 200) {
                 err(xhr.statusText);
                 return;
             } else if (resp.errcode) {
                 err(resp.errmsg);
                 return;
             }
-            urlInputElem.value = resp.data
+            const href = locationURL.toString()
+            urlInputElem.value = (href.charAt(href.length - 1) !== "/" ? href + "/" : href) + resp.data
             copyBtnElem.style.display = "block";
             submitBtnElem.style.display = "none";
             urlInputElem.addEventListener("change", shortenURLInputTrigger);
             urlInputElem.addEventListener("input", shortenURLInputTrigger);
         };
-        xhr.send("url=" + urlInputElem.value);
+        xhr.send("url=" + inputURL.toString());
     });
     copyBtnElem.addEventListener("click", e => {
         e.preventDefault();
@@ -55,13 +66,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const {state} = navigator.permissions.query({
             name: "clipboard-write",
         });
-        if (state == "denied") {
+        if (state === "denied") {
             err("clipboard permission is denied.");
             return;
         }
+        let buttonCopyTimer;
         navigator.clipboard.writeText(urlInputElem.value).then(() => {
             copyBtnElem.classList.add("copied");
-            let buttonCopyTimer;
             clearTimeout(buttonCopyTimer);
             buttonCopyTimer = setTimeout(() => {
                 copyBtnElem.classList.remove("copied");
