@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             urlInputElem.addEventListener("change", shortenURLInputTrigger);
             urlInputElem.addEventListener("input", shortenURLInputTrigger);
         };
-        xhr.send("url=" + inputURL.toString());
+        xhr.send("url=" + encodeURIComponent(inputURL.toString()));
     });
     copyBtnElem.addEventListener("click", e => {
         e.preventDefault();
