@@ -4,13 +4,17 @@ TARGET = -o $(BINARY)
 MAIN_FOLDER = ./cmd
 BUILD_FLAGS = $(TARGET)
 
-all:
-	go build $(BUILD_FLAGS) $(MAIN_FOLDER)
+all: pull update restart
+update: pull build
 run:
 	./$(BINARY)
+pull:
+	git pull
 build:
 	CGO_ENABLED=0 GOOS=linux go build $(BUILD_FLAGS) $(MAIN_FOLDER)
 	docker build -t $(IMAGE):latest .
+restart:
+	docker-compose restart
 up:
 	docker-compose up -d
 down:
