@@ -8,17 +8,17 @@ import (
 )
 
 type repository struct {
-	c *ent.ShortUrlClient
+	c *ent.Client
 }
 
 func NewRepository(c *ent.Client) Repository {
 	return &repository{
-		c: c.ShortUrl,
+		c: c,
 	}
 }
 
 func (r *repository) Create(ctx context.Context, shortUrl *ShortUrl) error {
-	_, err := r.c.Create().
+	_, err := r.c.ShortUrl.Create().
 		SetKey(shortUrl.Key).
 		SetURL(shortUrl.URL).
 		Save(ctx)
@@ -29,7 +29,7 @@ func (r *repository) Create(ctx context.Context, shortUrl *ShortUrl) error {
 }
 
 func (r *repository) Get(ctx context.Context, key string) (*ShortUrl, error) {
-	shortUrl, err := r.c.Query().Where(shorturl.Key(key)).Only(ctx)
+	shortUrl, err := r.c.ShortUrl.Query().Where(shorturl.Key(key)).Only(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (r *repository) Get(ctx context.Context, key string) (*ShortUrl, error) {
 }
 
 func (r *repository) IncrPV(ctx context.Context, id int) error {
-	return r.c.Update().
+	return r.c.ShortUrl.Update().
 		AddPv(1).
 		Where(shorturl.ID(id)).Exec(ctx)
 }
