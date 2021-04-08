@@ -33,7 +33,6 @@ func main() {
 		return
 	}
 	srv.Listen()
-	log.Info("Server listening...")
 
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)

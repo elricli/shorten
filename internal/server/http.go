@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/drrrMikado/shorten/internal/service"
+	"github.com/drrrMikado/shorten/pkg/log"
 	"github.com/drrrMikado/shorten/public/static"
 )
 
@@ -42,9 +42,10 @@ func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
 
 func (s *Server) Listen() {
 	s.start()
+	log.Infof("Server listening on %s...", s.opt.address)
 	// pprof
 	go func() {
-		log.Println(http.ListenAndServe(":6060", nil))
+		log.Info(http.ListenAndServe(":6060", nil))
 	}()
 }
 
@@ -52,7 +53,7 @@ func (s *Server) stop() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	if err := s.Shutdown(ctx); err != nil {
-		log.Println("Server forced to shutdown:", err)
+		log.Info("Server forced to shutdown:", err)
 	}
 }
 
@@ -60,10 +61,10 @@ func (s *Server) start() {
 	go func() {
 		lis, err := net.Listen(s.opt.network, s.opt.address)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 		if err := s.Serve(lis); err != nil && err != http.ErrServerClosed {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 	}()
 }
