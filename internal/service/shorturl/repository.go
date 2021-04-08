@@ -17,10 +17,11 @@ func NewRepository(c *ent.Client) Repository {
 	}
 }
 
-func (r *repository) Create(ctx context.Context, shortUrl *ShortUrl) error {
+func (r *repository) Create(ctx context.Context, su *ShortUrl) error {
 	_, err := r.c.ShortUrl.Create().
-		SetKey(shortUrl.Key).
-		SetURL(shortUrl.URL).
+		SetKey(su.Key).
+		SetURL(su.URL).
+		SetExpire(su.Expire).
 		Save(ctx)
 	if err != nil {
 		return err

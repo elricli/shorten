@@ -36,6 +36,7 @@ type ShortUrlMutation struct {
 	url           *string
 	pv            *uint64
 	addpv         *uint64
+	expire        *time.Time
 	create_at     *time.Time
 	update_at     *time.Time
 	clearedFields map[string]struct{}
@@ -265,6 +266,55 @@ func (m *ShortUrlMutation) ResetPv() {
 	delete(m.clearedFields, shorturl.FieldPv)
 }
 
+// SetExpire sets the "expire" field.
+func (m *ShortUrlMutation) SetExpire(t time.Time) {
+	m.expire = &t
+}
+
+// Expire returns the value of the "expire" field in the mutation.
+func (m *ShortUrlMutation) Expire() (r time.Time, exists bool) {
+	v := m.expire
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpire returns the old "expire" field's value of the ShortUrl entity.
+// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ShortUrlMutation) OldExpire(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldExpire is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldExpire requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpire: %w", err)
+	}
+	return oldValue.Expire, nil
+}
+
+// ClearExpire clears the value of the "expire" field.
+func (m *ShortUrlMutation) ClearExpire() {
+	m.expire = nil
+	m.clearedFields[shorturl.FieldExpire] = struct{}{}
+}
+
+// ExpireCleared returns if the "expire" field was cleared in this mutation.
+func (m *ShortUrlMutation) ExpireCleared() bool {
+	_, ok := m.clearedFields[shorturl.FieldExpire]
+	return ok
+}
+
+// ResetExpire resets all changes to the "expire" field.
+func (m *ShortUrlMutation) ResetExpire() {
+	m.expire = nil
+	delete(m.clearedFields, shorturl.FieldExpire)
+}
+
 // SetCreateAt sets the "create_at" field.
 func (m *ShortUrlMutation) SetCreateAt(t time.Time) {
 	m.create_at = &t
@@ -351,7 +401,7 @@ func (m *ShortUrlMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ShortUrlMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.key != nil {
 		fields = append(fields, shorturl.FieldKey)
 	}
@@ -360,6 +410,9 @@ func (m *ShortUrlMutation) Fields() []string {
 	}
 	if m.pv != nil {
 		fields = append(fields, shorturl.FieldPv)
+	}
+	if m.expire != nil {
+		fields = append(fields, shorturl.FieldExpire)
 	}
 	if m.create_at != nil {
 		fields = append(fields, shorturl.FieldCreateAt)
@@ -381,6 +434,8 @@ func (m *ShortUrlMutation) Field(name string) (ent.Value, bool) {
 		return m.URL()
 	case shorturl.FieldPv:
 		return m.Pv()
+	case shorturl.FieldExpire:
+		return m.Expire()
 	case shorturl.FieldCreateAt:
 		return m.CreateAt()
 	case shorturl.FieldUpdateAt:
@@ -400,6 +455,8 @@ func (m *ShortUrlMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldURL(ctx)
 	case shorturl.FieldPv:
 		return m.OldPv(ctx)
+	case shorturl.FieldExpire:
+		return m.OldExpire(ctx)
 	case shorturl.FieldCreateAt:
 		return m.OldCreateAt(ctx)
 	case shorturl.FieldUpdateAt:
@@ -433,6 +490,13 @@ func (m *ShortUrlMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPv(v)
+		return nil
+	case shorturl.FieldExpire:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpire(v)
 		return nil
 	case shorturl.FieldCreateAt:
 		v, ok := value.(time.Time)
@@ -496,6 +560,9 @@ func (m *ShortUrlMutation) ClearedFields() []string {
 	if m.FieldCleared(shorturl.FieldPv) {
 		fields = append(fields, shorturl.FieldPv)
 	}
+	if m.FieldCleared(shorturl.FieldExpire) {
+		fields = append(fields, shorturl.FieldExpire)
+	}
 	return fields
 }
 
@@ -513,6 +580,9 @@ func (m *ShortUrlMutation) ClearField(name string) error {
 	case shorturl.FieldPv:
 		m.ClearPv()
 		return nil
+	case shorturl.FieldExpire:
+		m.ClearExpire()
+		return nil
 	}
 	return fmt.Errorf("unknown ShortUrl nullable field %s", name)
 }
@@ -529,6 +599,9 @@ func (m *ShortUrlMutation) ResetField(name string) error {
 		return nil
 	case shorturl.FieldPv:
 		m.ResetPv()
+		return nil
+	case shorturl.FieldExpire:
+		m.ResetExpire()
 		return nil
 	case shorturl.FieldCreateAt:
 		m.ResetCreateAt()

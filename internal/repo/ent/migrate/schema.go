@@ -14,6 +14,7 @@ var (
 		{Name: "key", Type: field.TypeString, Default: ""},
 		{Name: "url", Type: field.TypeString, Default: ""},
 		{Name: "pv", Type: field.TypeUint64, Nullable: true},
+		{Name: "expire", Type: field.TypeTime, Nullable: true},
 		{Name: "create_at", Type: field.TypeTime},
 		{Name: "update_at", Type: field.TypeTime},
 	}

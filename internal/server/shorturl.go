@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strconv"
+	"time"
 
 	"github.com/drrrMikado/shorten/pkg/validator"
 )
@@ -28,7 +30,17 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 		u.Scheme = "http"
 		rawurl = u.String()
 	}
-	shortUrl, err := s.svc.ShortUrl.Shorten(ctx, rawurl)
+	expireParam := r.Form.Get("expire")
+	var expire time.Time
+	if expireParam != "" {
+		expireSec, err := strconv.Atoi(expireParam)
+		if err != nil {
+			_ = errResp(w, err)
+			return
+		}
+		expire = time.Now().Add(time.Duration(expireSec) * time.Second)
+	}
+	shortUrl, err := s.svc.ShortUrl.Shorten(ctx, rawurl, expire)
 	if err != nil {
 		_ = errResp(w, err)
 		return

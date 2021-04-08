@@ -113,6 +113,13 @@ func Pv(v uint64) predicate.ShortUrl {
 	})
 }
 
+// Expire applies equality check predicate on the "expire" field. It's identical to ExpireEQ.
+func Expire(v time.Time) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldExpire), v))
+	})
+}
+
 // CreateAt applies equality check predicate on the "create_at" field. It's identical to CreateAtEQ.
 func CreateAt(v time.Time) predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
@@ -436,6 +443,96 @@ func PvIsNil() predicate.ShortUrl {
 func PvNotNil() predicate.ShortUrl {
 	return predicate.ShortUrl(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldPv)))
+	})
+}
+
+// ExpireEQ applies the EQ predicate on the "expire" field.
+func ExpireEQ(v time.Time) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldExpire), v))
+	})
+}
+
+// ExpireNEQ applies the NEQ predicate on the "expire" field.
+func ExpireNEQ(v time.Time) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldExpire), v))
+	})
+}
+
+// ExpireIn applies the In predicate on the "expire" field.
+func ExpireIn(vs ...time.Time) predicate.ShortUrl {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldExpire), v...))
+	})
+}
+
+// ExpireNotIn applies the NotIn predicate on the "expire" field.
+func ExpireNotIn(vs ...time.Time) predicate.ShortUrl {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldExpire), v...))
+	})
+}
+
+// ExpireGT applies the GT predicate on the "expire" field.
+func ExpireGT(v time.Time) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldExpire), v))
+	})
+}
+
+// ExpireGTE applies the GTE predicate on the "expire" field.
+func ExpireGTE(v time.Time) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldExpire), v))
+	})
+}
+
+// ExpireLT applies the LT predicate on the "expire" field.
+func ExpireLT(v time.Time) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldExpire), v))
+	})
+}
+
+// ExpireLTE applies the LTE predicate on the "expire" field.
+func ExpireLTE(v time.Time) predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldExpire), v))
+	})
+}
+
+// ExpireIsNil applies the IsNil predicate on the "expire" field.
+func ExpireIsNil() predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldExpire)))
+	})
+}
+
+// ExpireNotNil applies the NotNil predicate on the "expire" field.
+func ExpireNotNil() predicate.ShortUrl {
+	return predicate.ShortUrl(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldExpire)))
 	})
 }
 

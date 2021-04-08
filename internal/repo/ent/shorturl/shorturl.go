@@ -17,6 +17,8 @@ const (
 	FieldURL = "url"
 	// FieldPv holds the string denoting the pv field in the database.
 	FieldPv = "pv"
+	// FieldExpire holds the string denoting the expire field in the database.
+	FieldExpire = "expire"
 	// FieldCreateAt holds the string denoting the create_at field in the database.
 	FieldCreateAt = "create_at"
 	// FieldUpdateAt holds the string denoting the update_at field in the database.
@@ -32,6 +34,7 @@ var Columns = []string{
 	FieldKey,
 	FieldURL,
 	FieldPv,
+	FieldExpire,
 	FieldCreateAt,
 	FieldUpdateAt,
 }

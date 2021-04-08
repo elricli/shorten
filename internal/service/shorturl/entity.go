@@ -2,18 +2,20 @@ package shorturl
 
 import (
 	"context"
+	"time"
 
 	"github.com/drrrMikado/shorten/internal/repo/ent"
 )
 
 type ShortUrl struct {
-	ID  int
-	Key string
-	URL string
+	ID     int
+	Key    string
+	URL    string
+	Expire time.Time
 }
 
 type Service interface {
-	Shorten(ctx context.Context, longUrl string) (*ShortUrl, error)
+	Shorten(ctx context.Context, longUrl string, expire time.Time) (*ShortUrl, error)
 	Redirect(ctx context.Context, key string) (*ShortUrl, error)
 }
 

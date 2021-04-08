@@ -62,6 +62,20 @@ func (suc *ShortUrlCreate) SetNillablePv(u *uint64) *ShortUrlCreate {
 	return suc
 }
 
+// SetExpire sets the "expire" field.
+func (suc *ShortUrlCreate) SetExpire(t time.Time) *ShortUrlCreate {
+	suc.mutation.SetExpire(t)
+	return suc
+}
+
+// SetNillableExpire sets the "expire" field if the given value is not nil.
+func (suc *ShortUrlCreate) SetNillableExpire(t *time.Time) *ShortUrlCreate {
+	if t != nil {
+		suc.SetExpire(*t)
+	}
+	return suc
+}
+
 // SetCreateAt sets the "create_at" field.
 func (suc *ShortUrlCreate) SetCreateAt(t time.Time) *ShortUrlCreate {
 	suc.mutation.SetCreateAt(t)
@@ -238,6 +252,14 @@ func (suc *ShortUrlCreate) createSpec() (*ShortUrl, *sqlgraph.CreateSpec) {
 			Column: shorturl.FieldPv,
 		})
 		_node.Pv = value
+	}
+	if value, ok := suc.mutation.Expire(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: shorturl.FieldExpire,
+		})
+		_node.Expire = value
 	}
 	if value, ok := suc.mutation.CreateAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

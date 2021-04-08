@@ -2,6 +2,8 @@ package shorturl
 
 import (
 	"context"
+	"errors"
+	"time"
 
 	"github.com/drrrMikado/shorten/internal/idworker"
 	"github.com/drrrMikado/shorten/pkg/encode"
@@ -18,7 +20,7 @@ func NewService(repo Repository) Service {
 	}
 }
 
-func (s *service) Shorten(ctx context.Context, longUrl string) (*ShortUrl, error) {
+func (s *service) Shorten(ctx context.Context, longUrl string, expire time.Time) (*ShortUrl, error) {
 	id, err := idworker.Get()
 	if err != nil {
 		log.Errorw("Failed get id by id worker", "err", err)
@@ -27,6 +29,9 @@ func (s *service) Shorten(ctx context.Context, longUrl string) (*ShortUrl, error
 	shortUrl := &ShortUrl{
 		Key: encode.ToBase62(uint64(id)),
 		URL: longUrl,
+	}
+	if !expire.IsZero() {
+		shortUrl.Expire = expire
 	}
 	err = s.repo.Create(ctx, shortUrl)
 	if err != nil {
@@ -48,6 +53,9 @@ func (s *service) Redirect(ctx context.Context, key string) (*ShortUrl, error) {
 			"err", err,
 		)
 		return nil, err
+	}
+	if !shortUrl.Expire.IsZero() && shortUrl.Expire.Before(time.Now()) {
+		return nil, errors.New("not found")
 	}
 	go func() {
 		if err := s.repo.IncrPV(context.TODO(), shortUrl.ID); err != nil {

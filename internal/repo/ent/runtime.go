@@ -32,11 +32,11 @@ func init() {
 	// shorturl.DefaultPv holds the default value on creation for the pv field.
 	shorturl.DefaultPv = shorturlDescPv.Default.(uint64)
 	// shorturlDescCreateAt is the schema descriptor for create_at field.
-	shorturlDescCreateAt := shorturlFields[3].Descriptor()
+	shorturlDescCreateAt := shorturlFields[4].Descriptor()
 	// shorturl.DefaultCreateAt holds the default value on creation for the create_at field.
 	shorturl.DefaultCreateAt = shorturlDescCreateAt.Default.(func() time.Time)
 	// shorturlDescUpdateAt is the schema descriptor for update_at field.
-	shorturlDescUpdateAt := shorturlFields[4].Descriptor()
+	shorturlDescUpdateAt := shorturlFields[5].Descriptor()
 	// shorturl.DefaultUpdateAt holds the default value on creation for the update_at field.
 	shorturl.DefaultUpdateAt = shorturlDescUpdateAt.Default.(func() time.Time)
 }

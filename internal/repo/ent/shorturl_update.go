@@ -82,6 +82,26 @@ func (suu *ShortUrlUpdate) ClearPv() *ShortUrlUpdate {
 	return suu
 }
 
+// SetExpire sets the "expire" field.
+func (suu *ShortUrlUpdate) SetExpire(t time.Time) *ShortUrlUpdate {
+	suu.mutation.SetExpire(t)
+	return suu
+}
+
+// SetNillableExpire sets the "expire" field if the given value is not nil.
+func (suu *ShortUrlUpdate) SetNillableExpire(t *time.Time) *ShortUrlUpdate {
+	if t != nil {
+		suu.SetExpire(*t)
+	}
+	return suu
+}
+
+// ClearExpire clears the value of the "expire" field.
+func (suu *ShortUrlUpdate) ClearExpire() *ShortUrlUpdate {
+	suu.mutation.ClearExpire()
+	return suu
+}
+
 // SetCreateAt sets the "create_at" field.
 func (suu *ShortUrlUpdate) SetCreateAt(t time.Time) *ShortUrlUpdate {
 	suu.mutation.SetCreateAt(t)
@@ -239,6 +259,19 @@ func (suu *ShortUrlUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: shorturl.FieldPv,
 		})
 	}
+	if value, ok := suu.mutation.Expire(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: shorturl.FieldExpire,
+		})
+	}
+	if suu.mutation.ExpireCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: shorturl.FieldExpire,
+		})
+	}
 	if value, ok := suu.mutation.CreateAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -323,6 +356,26 @@ func (suuo *ShortUrlUpdateOne) AddPv(u uint64) *ShortUrlUpdateOne {
 // ClearPv clears the value of the "pv" field.
 func (suuo *ShortUrlUpdateOne) ClearPv() *ShortUrlUpdateOne {
 	suuo.mutation.ClearPv()
+	return suuo
+}
+
+// SetExpire sets the "expire" field.
+func (suuo *ShortUrlUpdateOne) SetExpire(t time.Time) *ShortUrlUpdateOne {
+	suuo.mutation.SetExpire(t)
+	return suuo
+}
+
+// SetNillableExpire sets the "expire" field if the given value is not nil.
+func (suuo *ShortUrlUpdateOne) SetNillableExpire(t *time.Time) *ShortUrlUpdateOne {
+	if t != nil {
+		suuo.SetExpire(*t)
+	}
+	return suuo
+}
+
+// ClearExpire clears the value of the "expire" field.
+func (suuo *ShortUrlUpdateOne) ClearExpire() *ShortUrlUpdateOne {
+	suuo.mutation.ClearExpire()
 	return suuo
 }
 
@@ -486,6 +539,19 @@ func (suuo *ShortUrlUpdateOne) sqlSave(ctx context.Context) (_node *ShortUrl, er
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint64,
 			Column: shorturl.FieldPv,
+		})
+	}
+	if value, ok := suuo.mutation.Expire(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: shorturl.FieldExpire,
+		})
+	}
+	if suuo.mutation.ExpireCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: shorturl.FieldExpire,
 		})
 	}
 	if value, ok := suuo.mutation.CreateAt(); ok {
