@@ -20,6 +20,7 @@ type ShortUrlQuery struct {
 	config
 	limit      *int
 	offset     *int
+	unique     *bool
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.ShortUrl
@@ -43,6 +44,13 @@ func (suq *ShortUrlQuery) Limit(limit int) *ShortUrlQuery {
 // Offset adds an offset step to the query.
 func (suq *ShortUrlQuery) Offset(offset int) *ShortUrlQuery {
 	suq.offset = &offset
+	return suq
+}
+
+// Unique configures the query builder to filter duplicate records on query.
+// By default, unique is set to true, and can be disabled using this method.
+func (suq *ShortUrlQuery) Unique(unique bool) *ShortUrlQuery {
+	suq.unique = &unique
 	return suq
 }
 
@@ -334,7 +342,7 @@ func (suq *ShortUrlQuery) sqlCount(ctx context.Context) (int, error) {
 func (suq *ShortUrlQuery) sqlExist(ctx context.Context) (bool, error) {
 	n, err := suq.sqlCount(ctx)
 	if err != nil {
-		return false, fmt.Errorf("ent: check existence: %v", err)
+		return false, fmt.Errorf("ent: check existence: %w", err)
 	}
 	return n > 0, nil
 }
@@ -351,6 +359,9 @@ func (suq *ShortUrlQuery) querySpec() *sqlgraph.QuerySpec {
 		},
 		From:   suq.sql,
 		Unique: true,
+	}
+	if unique := suq.unique; unique != nil {
+		_spec.Unique = *unique
 	}
 	if fields := suq.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
@@ -377,7 +388,7 @@ func (suq *ShortUrlQuery) querySpec() *sqlgraph.QuerySpec {
 	if ps := suq.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
-				ps[i](selector, shorturl.ValidColumn)
+				ps[i](selector)
 			}
 		}
 	}
@@ -396,7 +407,7 @@ func (suq *ShortUrlQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		p(selector)
 	}
 	for _, p := range suq.order {
-		p(selector, shorturl.ValidColumn)
+		p(selector)
 	}
 	if offset := suq.offset; offset != nil {
 		// limit is mandatory for offset clause. We start
@@ -662,7 +673,7 @@ func (sugb *ShortUrlGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(sugb.fields)+len(sugb.fns))
 	columns = append(columns, sugb.fields...)
 	for _, fn := range sugb.fns {
-		columns = append(columns, fn(selector, shorturl.ValidColumn))
+		columns = append(columns, fn(selector))
 	}
 	return selector.Select(columns...).GroupBy(sugb.fields...)
 }

@@ -300,6 +300,7 @@ func (suu *ShortUrlUpdate) sqlSave(ctx context.Context) (n int, err error) {
 // ShortUrlUpdateOne is the builder for updating a single ShortUrl entity.
 type ShortUrlUpdateOne struct {
 	config
+	fields   []string
 	hooks    []Hook
 	mutation *ShortUrlMutation
 }
@@ -412,6 +413,13 @@ func (suuo *ShortUrlUpdateOne) Mutation() *ShortUrlMutation {
 	return suuo.mutation
 }
 
+// Select allows selecting one or more fields (columns) of the returned entity.
+// The default is selecting all fields defined in the entity schema.
+func (suuo *ShortUrlUpdateOne) Select(field string, fields ...string) *ShortUrlUpdateOne {
+	suuo.fields = append([]string{field}, fields...)
+	return suuo
+}
+
 // Save executes the query and returns the updated ShortUrl entity.
 func (suuo *ShortUrlUpdateOne) Save(ctx context.Context) (*ShortUrl, error) {
 	var (
@@ -500,6 +508,18 @@ func (suuo *ShortUrlUpdateOne) sqlSave(ctx context.Context) (_node *ShortUrl, er
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing ShortUrl.ID for update")}
 	}
 	_spec.Node.ID.Value = id
+	if fields := suuo.fields; len(fields) > 0 {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, shorturl.FieldID)
+		for _, f := range fields {
+			if !shorturl.ValidColumn(f) {
+				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
+			}
+			if f != shorturl.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, f)
+			}
+		}
+	}
 	if ps := suuo.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

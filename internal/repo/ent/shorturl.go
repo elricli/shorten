@@ -36,11 +36,11 @@ func (*ShortUrl) scanValues(columns []string) ([]interface{}, error) {
 	for i := range columns {
 		switch columns[i] {
 		case shorturl.FieldID, shorturl.FieldPv:
-			values[i] = &sql.NullInt64{}
+			values[i] = new(sql.NullInt64)
 		case shorturl.FieldKey, shorturl.FieldURL:
-			values[i] = &sql.NullString{}
+			values[i] = new(sql.NullString)
 		case shorturl.FieldExpire, shorturl.FieldCreateAt, shorturl.FieldUpdateAt:
-			values[i] = &sql.NullTime{}
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ShortUrl", columns[i])
 		}
