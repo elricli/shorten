@@ -15,3 +15,6 @@
 *.out
 
 cmd/shorten
+
+# Ignore, User-generated configuration file
+docker-compose.yml
