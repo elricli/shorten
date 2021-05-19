@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/drrrMikado/shorten/internal/di"
 	"github.com/drrrMikado/shorten/internal/server"
 	"github.com/drrrMikado/shorten/pkg/log"
 	"github.com/drrrMikado/shorten/pkg/middleware"
@@ -19,7 +18,7 @@ import (
 
 func main() {
 	flag.Parse()
-	srv, cf, err := di.InitServer(
+	srv, cf, err := InitServer(
 		server.Network("tcp"),
 		server.Address(os.Getenv("SHORTEN_ADDR")),
 		server.Middleware(middleware.Chain(
