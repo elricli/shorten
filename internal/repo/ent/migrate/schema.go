@@ -8,26 +8,26 @@ import (
 )
 
 var (
-	// ShortUrlsColumns holds the columns for the "short_urls" table.
-	ShortUrlsColumns = []*schema.Column{
+	// AliasColumns holds the columns for the "alias" table.
+	AliasColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "key", Type: field.TypeString, Default: ""},
 		{Name: "url", Type: field.TypeString, Default: ""},
 		{Name: "pv", Type: field.TypeUint64, Nullable: true, Default: 0},
 		{Name: "expire", Type: field.TypeTime, Nullable: true},
-		{Name: "create_at", Type: field.TypeTime},
-		{Name: "update_at", Type: field.TypeTime},
 	}
-	// ShortUrlsTable holds the schema information for the "short_urls" table.
-	ShortUrlsTable = &schema.Table{
-		Name:        "short_urls",
-		Columns:     ShortUrlsColumns,
-		PrimaryKey:  []*schema.Column{ShortUrlsColumns[0]},
+	// AliasTable holds the schema information for the "alias" table.
+	AliasTable = &schema.Table{
+		Name:        "alias",
+		Columns:     AliasColumns,
+		PrimaryKey:  []*schema.Column{AliasColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		ShortUrlsTable,
+		AliasTable,
 	}
 )
 

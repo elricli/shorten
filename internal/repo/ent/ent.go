@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
+	"github.com/drrrMikado/shorten/internal/repo/ent/alias"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -31,7 +31,7 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		shorturl.Table: shorturl.ValidColumn,
+		alias.Table: alias.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

@@ -5,38 +5,43 @@ package ent
 import (
 	"time"
 
+	"github.com/drrrMikado/shorten/internal/repo/ent/alias"
 	"github.com/drrrMikado/shorten/internal/repo/ent/schema"
-	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	shorturlFields := schema.ShortUrl{}.Fields()
-	_ = shorturlFields
-	// shorturlDescKey is the schema descriptor for key field.
-	shorturlDescKey := shorturlFields[0].Descriptor()
-	// shorturl.DefaultKey holds the default value on creation for the key field.
-	shorturl.DefaultKey = shorturlDescKey.Default.(string)
-	// shorturl.KeyValidator is a validator for the "key" field. It is called by the builders before save.
-	shorturl.KeyValidator = shorturlDescKey.Validators[0].(func(string) error)
-	// shorturlDescURL is the schema descriptor for url field.
-	shorturlDescURL := shorturlFields[1].Descriptor()
-	// shorturl.DefaultURL holds the default value on creation for the url field.
-	shorturl.DefaultURL = shorturlDescURL.Default.(string)
-	// shorturl.URLValidator is a validator for the "url" field. It is called by the builders before save.
-	shorturl.URLValidator = shorturlDescURL.Validators[0].(func(string) error)
-	// shorturlDescPv is the schema descriptor for pv field.
-	shorturlDescPv := shorturlFields[2].Descriptor()
-	// shorturl.DefaultPv holds the default value on creation for the pv field.
-	shorturl.DefaultPv = shorturlDescPv.Default.(uint64)
-	// shorturlDescCreateAt is the schema descriptor for create_at field.
-	shorturlDescCreateAt := shorturlFields[4].Descriptor()
-	// shorturl.DefaultCreateAt holds the default value on creation for the create_at field.
-	shorturl.DefaultCreateAt = shorturlDescCreateAt.Default.(func() time.Time)
-	// shorturlDescUpdateAt is the schema descriptor for update_at field.
-	shorturlDescUpdateAt := shorturlFields[5].Descriptor()
-	// shorturl.DefaultUpdateAt holds the default value on creation for the update_at field.
-	shorturl.DefaultUpdateAt = shorturlDescUpdateAt.Default.(func() time.Time)
+	aliasMixin := schema.Alias{}.Mixin()
+	aliasMixinFields0 := aliasMixin[0].Fields()
+	_ = aliasMixinFields0
+	aliasFields := schema.Alias{}.Fields()
+	_ = aliasFields
+	// aliasDescCreateTime is the schema descriptor for create_time field.
+	aliasDescCreateTime := aliasMixinFields0[0].Descriptor()
+	// alias.DefaultCreateTime holds the default value on creation for the create_time field.
+	alias.DefaultCreateTime = aliasDescCreateTime.Default.(func() time.Time)
+	// aliasDescUpdateTime is the schema descriptor for update_time field.
+	aliasDescUpdateTime := aliasMixinFields0[1].Descriptor()
+	// alias.DefaultUpdateTime holds the default value on creation for the update_time field.
+	alias.DefaultUpdateTime = aliasDescUpdateTime.Default.(func() time.Time)
+	// alias.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	alias.UpdateDefaultUpdateTime = aliasDescUpdateTime.UpdateDefault.(func() time.Time)
+	// aliasDescKey is the schema descriptor for key field.
+	aliasDescKey := aliasFields[0].Descriptor()
+	// alias.DefaultKey holds the default value on creation for the key field.
+	alias.DefaultKey = aliasDescKey.Default.(string)
+	// alias.KeyValidator is a validator for the "key" field. It is called by the builders before save.
+	alias.KeyValidator = aliasDescKey.Validators[0].(func(string) error)
+	// aliasDescURL is the schema descriptor for url field.
+	aliasDescURL := aliasFields[1].Descriptor()
+	// alias.DefaultURL holds the default value on creation for the url field.
+	alias.DefaultURL = aliasDescURL.Default.(string)
+	// alias.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	alias.URLValidator = aliasDescURL.Validators[0].(func(string) error)
+	// aliasDescPv is the schema descriptor for pv field.
+	aliasDescPv := aliasFields[2].Descriptor()
+	// alias.DefaultPv holds the default value on creation for the pv field.
+	alias.DefaultPv = aliasDescPv.Default.(uint64)
 }

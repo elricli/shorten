@@ -6,5 +6,5 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// ShortUrl is the predicate function for shorturl builders.
-type ShortUrl func(*sql.Selector)
+// Alias is the predicate function for alias builders.
+type Alias func(*sql.Selector)

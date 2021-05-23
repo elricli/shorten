@@ -9,15 +9,15 @@ import (
 	"github.com/drrrMikado/shorten/internal/repo/ent"
 )
 
-// The ShortUrlFunc type is an adapter to allow the use of ordinary
-// function as ShortUrl mutator.
-type ShortUrlFunc func(context.Context, *ent.ShortUrlMutation) (ent.Value, error)
+// The AliasFunc type is an adapter to allow the use of ordinary
+// function as Alias mutator.
+type AliasFunc func(context.Context, *ent.AliasMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f ShortUrlFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ShortUrlMutation)
+func (f AliasFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.AliasMutation)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ShortUrlMutation", m)
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AliasMutation", m)
 	}
 	return f(ctx, mv)
 }

@@ -6,21 +6,24 @@
 package main
 
 import (
+	"github.com/drrrMikado/shorten/internal/domain/alias"
 	"github.com/drrrMikado/shorten/internal/repo"
 	"github.com/drrrMikado/shorten/internal/server"
 	"github.com/drrrMikado/shorten/internal/service"
+	"go.uber.org/zap"
 )
 
 // Injectors from wire.go:
 
-func InitServer(opts ...server.Option) (*server.Server, func(), error) {
-	repository, cleanup, err := repo.NewRepository()
+func Init(logger *zap.SugaredLogger, repoCfg repo.Config, opts ...server.Option) (*server.Server, func(), error) {
+	repoRepo, cleanup, err := repo.New(repoCfg)
 	if err != nil {
 		return nil, nil, err
 	}
-	shorturlRepository := repository.ShortUrl
-	serviceService := service.New(shorturlRepository)
-	serverServer, cleanup2 := server.NewServer(serviceService, opts...)
+	repository := alias.NewRepository(repoRepo)
+	usecase := alias.NewUseCase(repository, logger)
+	serviceService := service.New(logger, usecase)
+	serverServer, cleanup2 := server.New(serviceService, logger, opts...)
 	return serverServer, func() {
 		cleanup2()
 		cleanup()

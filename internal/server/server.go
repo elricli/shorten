@@ -7,24 +7,28 @@ import (
 	"strings"
 	"time"
 
-	_ "net/http/pprof"
-
 	"github.com/drrrMikado/shorten/internal/service"
-	"github.com/drrrMikado/shorten/pkg/log"
 	"github.com/drrrMikado/shorten/public/static"
+	"github.com/google/wire"
+	"go.uber.org/zap"
+
+	_ "net/http/pprof"
 )
+
+var ProviderSet = wire.NewSet(New)
 
 type Server struct {
 	*http.Server
 	svc *service.Service
 	opt option
+	log *zap.SugaredLogger
 }
 
 const (
 	_defaultAddr = ":8080"
 )
 
-func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
+func New(svc *service.Service, logger *zap.SugaredLogger, opts ...Option) (*Server, func()) {
 	opt := option{
 		network: "tcp",
 		address: _defaultAddr,
@@ -35,6 +39,7 @@ func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
 	s := &Server{
 		svc: svc,
 		opt: opt,
+		log: logger.Named("server"),
 	}
 	s.initHandler()
 	return s, s.stop
@@ -42,10 +47,10 @@ func NewServer(svc *service.Service, opts ...Option) (*Server, func()) {
 
 func (s *Server) Listen() {
 	s.start()
-	log.Infof("Server listening on %s...", s.opt.address)
+	s.log.Infof("Server listening on %s...", s.opt.address)
 	// pprof
 	go func() {
-		log.Info(http.ListenAndServe(":6060", nil))
+		s.log.Info(http.ListenAndServe(":6060", nil))
 	}()
 }
 
@@ -53,7 +58,7 @@ func (s *Server) stop() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	if err := s.Shutdown(ctx); err != nil {
-		log.Info("Server forced to shutdown:", err)
+		s.log.Info("Server forced to shutdown:", err)
 	}
 }
 
@@ -61,10 +66,10 @@ func (s *Server) start() {
 	go func() {
 		lis, err := net.Listen(s.opt.network, s.opt.address)
 		if err != nil {
-			log.Fatal(err)
+			s.log.Fatal(err)
 		}
 		if err := s.Serve(lis); err != nil && err != http.ErrServerClosed {
-			log.Fatal(err)
+			s.log.Fatal(err)
 		}
 	}()
 }
@@ -82,12 +87,12 @@ func (s *Server) initHandler() {
 		case "/api/shorten":
 			s.shorten(w, r)
 		default:
-			shortUrl, err := s.svc.ShortUrl.Redirect(r.Context(), strings.Trim(path, "/"))
-			if err != nil || shortUrl.URL == "" {
+			longurl, err := s.svc.Redirect(r.Context(), strings.Trim(path, "/"))
+			if err != nil || longurl == "" {
 				http.Error(w, ErrLinkNotExist.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, shortUrl.URL, http.StatusMovedPermanently)
+			http.Redirect(w, r, longurl, http.StatusMovedPermanently)
 		}
 		return
 	})

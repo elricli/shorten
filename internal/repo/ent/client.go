@@ -9,7 +9,7 @@ import (
 
 	"github.com/drrrMikado/shorten/internal/repo/ent/migrate"
 
-	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
+	"github.com/drrrMikado/shorten/internal/repo/ent/alias"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -20,8 +20,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// ShortUrl is the client for interacting with the ShortUrl builders.
-	ShortUrl *ShortUrlClient
+	// Alias is the client for interacting with the Alias builders.
+	Alias *AliasClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -35,7 +35,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.ShortUrl = NewShortUrlClient(c.config)
+	c.Alias = NewAliasClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -67,9 +67,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:      ctx,
-		config:   cfg,
-		ShortUrl: NewShortUrlClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		Alias:  NewAliasClient(cfg),
 	}, nil
 }
 
@@ -87,15 +87,15 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:   cfg,
-		ShortUrl: NewShortUrlClient(cfg),
+		config: cfg,
+		Alias:  NewAliasClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		ShortUrl.
+//		Alias.
 //		Query().
 //		Count(ctx)
 //
@@ -118,87 +118,87 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.ShortUrl.Use(hooks...)
+	c.Alias.Use(hooks...)
 }
 
-// ShortUrlClient is a client for the ShortUrl schema.
-type ShortUrlClient struct {
+// AliasClient is a client for the Alias schema.
+type AliasClient struct {
 	config
 }
 
-// NewShortUrlClient returns a client for the ShortUrl from the given config.
-func NewShortUrlClient(c config) *ShortUrlClient {
-	return &ShortUrlClient{config: c}
+// NewAliasClient returns a client for the Alias from the given config.
+func NewAliasClient(c config) *AliasClient {
+	return &AliasClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `shorturl.Hooks(f(g(h())))`.
-func (c *ShortUrlClient) Use(hooks ...Hook) {
-	c.hooks.ShortUrl = append(c.hooks.ShortUrl, hooks...)
+// A call to `Use(f, g, h)` equals to `alias.Hooks(f(g(h())))`.
+func (c *AliasClient) Use(hooks ...Hook) {
+	c.hooks.Alias = append(c.hooks.Alias, hooks...)
 }
 
-// Create returns a create builder for ShortUrl.
-func (c *ShortUrlClient) Create() *ShortUrlCreate {
-	mutation := newShortUrlMutation(c.config, OpCreate)
-	return &ShortUrlCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a create builder for Alias.
+func (c *AliasClient) Create() *AliasCreate {
+	mutation := newAliasMutation(c.config, OpCreate)
+	return &AliasCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of ShortUrl entities.
-func (c *ShortUrlClient) CreateBulk(builders ...*ShortUrlCreate) *ShortUrlCreateBulk {
-	return &ShortUrlCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Alias entities.
+func (c *AliasClient) CreateBulk(builders ...*AliasCreate) *AliasCreateBulk {
+	return &AliasCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for ShortUrl.
-func (c *ShortUrlClient) Update() *ShortUrlUpdate {
-	mutation := newShortUrlMutation(c.config, OpUpdate)
-	return &ShortUrlUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Alias.
+func (c *AliasClient) Update() *AliasUpdate {
+	mutation := newAliasMutation(c.config, OpUpdate)
+	return &AliasUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ShortUrlClient) UpdateOne(su *ShortUrl) *ShortUrlUpdateOne {
-	mutation := newShortUrlMutation(c.config, OpUpdateOne, withShortUrl(su))
-	return &ShortUrlUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *AliasClient) UpdateOne(a *Alias) *AliasUpdateOne {
+	mutation := newAliasMutation(c.config, OpUpdateOne, withAlias(a))
+	return &AliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ShortUrlClient) UpdateOneID(id int) *ShortUrlUpdateOne {
-	mutation := newShortUrlMutation(c.config, OpUpdateOne, withShortUrlID(id))
-	return &ShortUrlUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *AliasClient) UpdateOneID(id int) *AliasUpdateOne {
+	mutation := newAliasMutation(c.config, OpUpdateOne, withAliasID(id))
+	return &AliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for ShortUrl.
-func (c *ShortUrlClient) Delete() *ShortUrlDelete {
-	mutation := newShortUrlMutation(c.config, OpDelete)
-	return &ShortUrlDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Alias.
+func (c *AliasClient) Delete() *AliasDelete {
+	mutation := newAliasMutation(c.config, OpDelete)
+	return &AliasDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a delete builder for the given entity.
-func (c *ShortUrlClient) DeleteOne(su *ShortUrl) *ShortUrlDeleteOne {
-	return c.DeleteOneID(su.ID)
+func (c *AliasClient) DeleteOne(a *Alias) *AliasDeleteOne {
+	return c.DeleteOneID(a.ID)
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *ShortUrlClient) DeleteOneID(id int) *ShortUrlDeleteOne {
-	builder := c.Delete().Where(shorturl.ID(id))
+func (c *AliasClient) DeleteOneID(id int) *AliasDeleteOne {
+	builder := c.Delete().Where(alias.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &ShortUrlDeleteOne{builder}
+	return &AliasDeleteOne{builder}
 }
 
-// Query returns a query builder for ShortUrl.
-func (c *ShortUrlClient) Query() *ShortUrlQuery {
-	return &ShortUrlQuery{
+// Query returns a query builder for Alias.
+func (c *AliasClient) Query() *AliasQuery {
+	return &AliasQuery{
 		config: c.config,
 	}
 }
 
-// Get returns a ShortUrl entity by its id.
-func (c *ShortUrlClient) Get(ctx context.Context, id int) (*ShortUrl, error) {
-	return c.Query().Where(shorturl.ID(id)).Only(ctx)
+// Get returns a Alias entity by its id.
+func (c *AliasClient) Get(ctx context.Context, id int) (*Alias, error) {
+	return c.Query().Where(alias.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ShortUrlClient) GetX(ctx context.Context, id int) *ShortUrl {
+func (c *AliasClient) GetX(ctx context.Context, id int) *Alias {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -207,6 +207,6 @@ func (c *ShortUrlClient) GetX(ctx context.Context, id int) *ShortUrl {
 }
 
 // Hooks returns the client hooks.
-func (c *ShortUrlClient) Hooks() []Hook {
-	return c.hooks.ShortUrl
+func (c *AliasClient) Hooks() []Hook {
+	return c.hooks.Alias
 }

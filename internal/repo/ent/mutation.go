@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/drrrMikado/shorten/internal/repo/ent/alias"
 	"github.com/drrrMikado/shorten/internal/repo/ent/predicate"
-	"github.com/drrrMikado/shorten/internal/repo/ent/shorturl"
 
 	"entgo.io/ent"
 )
@@ -23,39 +23,39 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeShortUrl = "ShortUrl"
+	TypeAlias = "Alias"
 )
 
-// ShortUrlMutation represents an operation that mutates the ShortUrl nodes in the graph.
-type ShortUrlMutation struct {
+// AliasMutation represents an operation that mutates the Alias nodes in the graph.
+type AliasMutation struct {
 	config
 	op            Op
 	typ           string
 	id            *int
+	create_time   *time.Time
+	update_time   *time.Time
 	key           *string
 	url           *string
 	pv            *uint64
 	addpv         *uint64
 	expire        *time.Time
-	create_at     *time.Time
-	update_at     *time.Time
 	clearedFields map[string]struct{}
 	done          bool
-	oldValue      func(context.Context) (*ShortUrl, error)
-	predicates    []predicate.ShortUrl
+	oldValue      func(context.Context) (*Alias, error)
+	predicates    []predicate.Alias
 }
 
-var _ ent.Mutation = (*ShortUrlMutation)(nil)
+var _ ent.Mutation = (*AliasMutation)(nil)
 
-// shorturlOption allows management of the mutation configuration using functional options.
-type shorturlOption func(*ShortUrlMutation)
+// aliasOption allows management of the mutation configuration using functional options.
+type aliasOption func(*AliasMutation)
 
-// newShortUrlMutation creates new mutation for the ShortUrl entity.
-func newShortUrlMutation(c config, op Op, opts ...shorturlOption) *ShortUrlMutation {
-	m := &ShortUrlMutation{
+// newAliasMutation creates new mutation for the Alias entity.
+func newAliasMutation(c config, op Op, opts ...aliasOption) *AliasMutation {
+	m := &AliasMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeShortUrl,
+		typ:           TypeAlias,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -64,20 +64,20 @@ func newShortUrlMutation(c config, op Op, opts ...shorturlOption) *ShortUrlMutat
 	return m
 }
 
-// withShortUrlID sets the ID field of the mutation.
-func withShortUrlID(id int) shorturlOption {
-	return func(m *ShortUrlMutation) {
+// withAliasID sets the ID field of the mutation.
+func withAliasID(id int) aliasOption {
+	return func(m *AliasMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *ShortUrl
+			value *Alias
 		)
-		m.oldValue = func(ctx context.Context) (*ShortUrl, error) {
+		m.oldValue = func(ctx context.Context) (*Alias, error) {
 			once.Do(func() {
 				if m.done {
 					err = fmt.Errorf("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().ShortUrl.Get(ctx, id)
+					value, err = m.Client().Alias.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -86,10 +86,10 @@ func withShortUrlID(id int) shorturlOption {
 	}
 }
 
-// withShortUrl sets the old ShortUrl of the mutation.
-func withShortUrl(node *ShortUrl) shorturlOption {
-	return func(m *ShortUrlMutation) {
-		m.oldValue = func(context.Context) (*ShortUrl, error) {
+// withAlias sets the old Alias of the mutation.
+func withAlias(node *Alias) aliasOption {
+	return func(m *AliasMutation) {
+		m.oldValue = func(context.Context) (*Alias, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -98,7 +98,7 @@ func withShortUrl(node *ShortUrl) shorturlOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ShortUrlMutation) Client() *Client {
+func (m AliasMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -106,7 +106,7 @@ func (m ShortUrlMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m ShortUrlMutation) Tx() (*Tx, error) {
+func (m AliasMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
 	}
@@ -117,20 +117,92 @@ func (m ShortUrlMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID
 // is only available if it was provided to the builder.
-func (m *ShortUrlMutation) ID() (id int, exists bool) {
+func (m *AliasMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
 	return *m.id, true
 }
 
+// SetCreateTime sets the "create_time" field.
+func (m *AliasMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *AliasMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the Alias entity.
+// If the Alias object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AliasMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *AliasMutation) ResetCreateTime() {
+	m.create_time = nil
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *AliasMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *AliasMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the Alias entity.
+// If the Alias object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AliasMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *AliasMutation) ResetUpdateTime() {
+	m.update_time = nil
+}
+
 // SetKey sets the "key" field.
-func (m *ShortUrlMutation) SetKey(s string) {
+func (m *AliasMutation) SetKey(s string) {
 	m.key = &s
 }
 
 // Key returns the value of the "key" field in the mutation.
-func (m *ShortUrlMutation) Key() (r string, exists bool) {
+func (m *AliasMutation) Key() (r string, exists bool) {
 	v := m.key
 	if v == nil {
 		return
@@ -138,10 +210,10 @@ func (m *ShortUrlMutation) Key() (r string, exists bool) {
 	return *v, true
 }
 
-// OldKey returns the old "key" field's value of the ShortUrl entity.
-// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
+// OldKey returns the old "key" field's value of the Alias entity.
+// If the Alias object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShortUrlMutation) OldKey(ctx context.Context) (v string, err error) {
+func (m *AliasMutation) OldKey(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldKey is only allowed on UpdateOne operations")
 	}
@@ -156,17 +228,17 @@ func (m *ShortUrlMutation) OldKey(ctx context.Context) (v string, err error) {
 }
 
 // ResetKey resets all changes to the "key" field.
-func (m *ShortUrlMutation) ResetKey() {
+func (m *AliasMutation) ResetKey() {
 	m.key = nil
 }
 
 // SetURL sets the "url" field.
-func (m *ShortUrlMutation) SetURL(s string) {
+func (m *AliasMutation) SetURL(s string) {
 	m.url = &s
 }
 
 // URL returns the value of the "url" field in the mutation.
-func (m *ShortUrlMutation) URL() (r string, exists bool) {
+func (m *AliasMutation) URL() (r string, exists bool) {
 	v := m.url
 	if v == nil {
 		return
@@ -174,10 +246,10 @@ func (m *ShortUrlMutation) URL() (r string, exists bool) {
 	return *v, true
 }
 
-// OldURL returns the old "url" field's value of the ShortUrl entity.
-// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
+// OldURL returns the old "url" field's value of the Alias entity.
+// If the Alias object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShortUrlMutation) OldURL(ctx context.Context) (v string, err error) {
+func (m *AliasMutation) OldURL(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldURL is only allowed on UpdateOne operations")
 	}
@@ -192,18 +264,18 @@ func (m *ShortUrlMutation) OldURL(ctx context.Context) (v string, err error) {
 }
 
 // ResetURL resets all changes to the "url" field.
-func (m *ShortUrlMutation) ResetURL() {
+func (m *AliasMutation) ResetURL() {
 	m.url = nil
 }
 
 // SetPv sets the "pv" field.
-func (m *ShortUrlMutation) SetPv(u uint64) {
+func (m *AliasMutation) SetPv(u uint64) {
 	m.pv = &u
 	m.addpv = nil
 }
 
 // Pv returns the value of the "pv" field in the mutation.
-func (m *ShortUrlMutation) Pv() (r uint64, exists bool) {
+func (m *AliasMutation) Pv() (r uint64, exists bool) {
 	v := m.pv
 	if v == nil {
 		return
@@ -211,10 +283,10 @@ func (m *ShortUrlMutation) Pv() (r uint64, exists bool) {
 	return *v, true
 }
 
-// OldPv returns the old "pv" field's value of the ShortUrl entity.
-// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
+// OldPv returns the old "pv" field's value of the Alias entity.
+// If the Alias object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShortUrlMutation) OldPv(ctx context.Context) (v uint64, err error) {
+func (m *AliasMutation) OldPv(ctx context.Context) (v uint64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldPv is only allowed on UpdateOne operations")
 	}
@@ -229,7 +301,7 @@ func (m *ShortUrlMutation) OldPv(ctx context.Context) (v uint64, err error) {
 }
 
 // AddPv adds u to the "pv" field.
-func (m *ShortUrlMutation) AddPv(u uint64) {
+func (m *AliasMutation) AddPv(u uint64) {
 	if m.addpv != nil {
 		*m.addpv += u
 	} else {
@@ -238,7 +310,7 @@ func (m *ShortUrlMutation) AddPv(u uint64) {
 }
 
 // AddedPv returns the value that was added to the "pv" field in this mutation.
-func (m *ShortUrlMutation) AddedPv() (r uint64, exists bool) {
+func (m *AliasMutation) AddedPv() (r uint64, exists bool) {
 	v := m.addpv
 	if v == nil {
 		return
@@ -247,32 +319,32 @@ func (m *ShortUrlMutation) AddedPv() (r uint64, exists bool) {
 }
 
 // ClearPv clears the value of the "pv" field.
-func (m *ShortUrlMutation) ClearPv() {
+func (m *AliasMutation) ClearPv() {
 	m.pv = nil
 	m.addpv = nil
-	m.clearedFields[shorturl.FieldPv] = struct{}{}
+	m.clearedFields[alias.FieldPv] = struct{}{}
 }
 
 // PvCleared returns if the "pv" field was cleared in this mutation.
-func (m *ShortUrlMutation) PvCleared() bool {
-	_, ok := m.clearedFields[shorturl.FieldPv]
+func (m *AliasMutation) PvCleared() bool {
+	_, ok := m.clearedFields[alias.FieldPv]
 	return ok
 }
 
 // ResetPv resets all changes to the "pv" field.
-func (m *ShortUrlMutation) ResetPv() {
+func (m *AliasMutation) ResetPv() {
 	m.pv = nil
 	m.addpv = nil
-	delete(m.clearedFields, shorturl.FieldPv)
+	delete(m.clearedFields, alias.FieldPv)
 }
 
 // SetExpire sets the "expire" field.
-func (m *ShortUrlMutation) SetExpire(t time.Time) {
+func (m *AliasMutation) SetExpire(t time.Time) {
 	m.expire = &t
 }
 
 // Expire returns the value of the "expire" field in the mutation.
-func (m *ShortUrlMutation) Expire() (r time.Time, exists bool) {
+func (m *AliasMutation) Expire() (r time.Time, exists bool) {
 	v := m.expire
 	if v == nil {
 		return
@@ -280,10 +352,10 @@ func (m *ShortUrlMutation) Expire() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldExpire returns the old "expire" field's value of the ShortUrl entity.
-// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
+// OldExpire returns the old "expire" field's value of the Alias entity.
+// If the Alias object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShortUrlMutation) OldExpire(ctx context.Context) (v time.Time, err error) {
+func (m *AliasMutation) OldExpire(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldExpire is only allowed on UpdateOne operations")
 	}
@@ -298,127 +370,55 @@ func (m *ShortUrlMutation) OldExpire(ctx context.Context) (v time.Time, err erro
 }
 
 // ClearExpire clears the value of the "expire" field.
-func (m *ShortUrlMutation) ClearExpire() {
+func (m *AliasMutation) ClearExpire() {
 	m.expire = nil
-	m.clearedFields[shorturl.FieldExpire] = struct{}{}
+	m.clearedFields[alias.FieldExpire] = struct{}{}
 }
 
 // ExpireCleared returns if the "expire" field was cleared in this mutation.
-func (m *ShortUrlMutation) ExpireCleared() bool {
-	_, ok := m.clearedFields[shorturl.FieldExpire]
+func (m *AliasMutation) ExpireCleared() bool {
+	_, ok := m.clearedFields[alias.FieldExpire]
 	return ok
 }
 
 // ResetExpire resets all changes to the "expire" field.
-func (m *ShortUrlMutation) ResetExpire() {
+func (m *AliasMutation) ResetExpire() {
 	m.expire = nil
-	delete(m.clearedFields, shorturl.FieldExpire)
-}
-
-// SetCreateAt sets the "create_at" field.
-func (m *ShortUrlMutation) SetCreateAt(t time.Time) {
-	m.create_at = &t
-}
-
-// CreateAt returns the value of the "create_at" field in the mutation.
-func (m *ShortUrlMutation) CreateAt() (r time.Time, exists bool) {
-	v := m.create_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreateAt returns the old "create_at" field's value of the ShortUrl entity.
-// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShortUrlMutation) OldCreateAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldCreateAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldCreateAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreateAt: %w", err)
-	}
-	return oldValue.CreateAt, nil
-}
-
-// ResetCreateAt resets all changes to the "create_at" field.
-func (m *ShortUrlMutation) ResetCreateAt() {
-	m.create_at = nil
-}
-
-// SetUpdateAt sets the "update_at" field.
-func (m *ShortUrlMutation) SetUpdateAt(t time.Time) {
-	m.update_at = &t
-}
-
-// UpdateAt returns the value of the "update_at" field in the mutation.
-func (m *ShortUrlMutation) UpdateAt() (r time.Time, exists bool) {
-	v := m.update_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdateAt returns the old "update_at" field's value of the ShortUrl entity.
-// If the ShortUrl object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ShortUrlMutation) OldUpdateAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldUpdateAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldUpdateAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdateAt: %w", err)
-	}
-	return oldValue.UpdateAt, nil
-}
-
-// ResetUpdateAt resets all changes to the "update_at" field.
-func (m *ShortUrlMutation) ResetUpdateAt() {
-	m.update_at = nil
+	delete(m.clearedFields, alias.FieldExpire)
 }
 
 // Op returns the operation name.
-func (m *ShortUrlMutation) Op() Op {
+func (m *AliasMutation) Op() Op {
 	return m.op
 }
 
-// Type returns the node type of this mutation (ShortUrl).
-func (m *ShortUrlMutation) Type() string {
+// Type returns the node type of this mutation (Alias).
+func (m *AliasMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *ShortUrlMutation) Fields() []string {
+func (m *AliasMutation) Fields() []string {
 	fields := make([]string, 0, 6)
+	if m.create_time != nil {
+		fields = append(fields, alias.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, alias.FieldUpdateTime)
+	}
 	if m.key != nil {
-		fields = append(fields, shorturl.FieldKey)
+		fields = append(fields, alias.FieldKey)
 	}
 	if m.url != nil {
-		fields = append(fields, shorturl.FieldURL)
+		fields = append(fields, alias.FieldURL)
 	}
 	if m.pv != nil {
-		fields = append(fields, shorturl.FieldPv)
+		fields = append(fields, alias.FieldPv)
 	}
 	if m.expire != nil {
-		fields = append(fields, shorturl.FieldExpire)
-	}
-	if m.create_at != nil {
-		fields = append(fields, shorturl.FieldCreateAt)
-	}
-	if m.update_at != nil {
-		fields = append(fields, shorturl.FieldUpdateAt)
+		fields = append(fields, alias.FieldExpire)
 	}
 	return fields
 }
@@ -426,20 +426,20 @@ func (m *ShortUrlMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *ShortUrlMutation) Field(name string) (ent.Value, bool) {
+func (m *AliasMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case shorturl.FieldKey:
+	case alias.FieldCreateTime:
+		return m.CreateTime()
+	case alias.FieldUpdateTime:
+		return m.UpdateTime()
+	case alias.FieldKey:
 		return m.Key()
-	case shorturl.FieldURL:
+	case alias.FieldURL:
 		return m.URL()
-	case shorturl.FieldPv:
+	case alias.FieldPv:
 		return m.Pv()
-	case shorturl.FieldExpire:
+	case alias.FieldExpire:
 		return m.Expire()
-	case shorturl.FieldCreateAt:
-		return m.CreateAt()
-	case shorturl.FieldUpdateAt:
-		return m.UpdateAt()
 	}
 	return nil, false
 }
@@ -447,81 +447,81 @@ func (m *ShortUrlMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *ShortUrlMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *AliasMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case shorturl.FieldKey:
+	case alias.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case alias.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	case alias.FieldKey:
 		return m.OldKey(ctx)
-	case shorturl.FieldURL:
+	case alias.FieldURL:
 		return m.OldURL(ctx)
-	case shorturl.FieldPv:
+	case alias.FieldPv:
 		return m.OldPv(ctx)
-	case shorturl.FieldExpire:
+	case alias.FieldExpire:
 		return m.OldExpire(ctx)
-	case shorturl.FieldCreateAt:
-		return m.OldCreateAt(ctx)
-	case shorturl.FieldUpdateAt:
-		return m.OldUpdateAt(ctx)
 	}
-	return nil, fmt.Errorf("unknown ShortUrl field %s", name)
+	return nil, fmt.Errorf("unknown Alias field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *ShortUrlMutation) SetField(name string, value ent.Value) error {
+func (m *AliasMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case shorturl.FieldKey:
+	case alias.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case alias.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	case alias.FieldKey:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetKey(v)
 		return nil
-	case shorturl.FieldURL:
+	case alias.FieldURL:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetURL(v)
 		return nil
-	case shorturl.FieldPv:
+	case alias.FieldPv:
 		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPv(v)
 		return nil
-	case shorturl.FieldExpire:
+	case alias.FieldExpire:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetExpire(v)
 		return nil
-	case shorturl.FieldCreateAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreateAt(v)
-		return nil
-	case shorturl.FieldUpdateAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdateAt(v)
-		return nil
 	}
-	return fmt.Errorf("unknown ShortUrl field %s", name)
+	return fmt.Errorf("unknown Alias field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *ShortUrlMutation) AddedFields() []string {
+func (m *AliasMutation) AddedFields() []string {
 	var fields []string
 	if m.addpv != nil {
-		fields = append(fields, shorturl.FieldPv)
+		fields = append(fields, alias.FieldPv)
 	}
 	return fields
 }
@@ -529,9 +529,9 @@ func (m *ShortUrlMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *ShortUrlMutation) AddedField(name string) (ent.Value, bool) {
+func (m *AliasMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case shorturl.FieldPv:
+	case alias.FieldPv:
 		return m.AddedPv()
 	}
 	return nil, false
@@ -540,9 +540,9 @@ func (m *ShortUrlMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *ShortUrlMutation) AddField(name string, value ent.Value) error {
+func (m *AliasMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case shorturl.FieldPv:
+	case alias.FieldPv:
 		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -550,113 +550,113 @@ func (m *ShortUrlMutation) AddField(name string, value ent.Value) error {
 		m.AddPv(v)
 		return nil
 	}
-	return fmt.Errorf("unknown ShortUrl numeric field %s", name)
+	return fmt.Errorf("unknown Alias numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *ShortUrlMutation) ClearedFields() []string {
+func (m *AliasMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(shorturl.FieldPv) {
-		fields = append(fields, shorturl.FieldPv)
+	if m.FieldCleared(alias.FieldPv) {
+		fields = append(fields, alias.FieldPv)
 	}
-	if m.FieldCleared(shorturl.FieldExpire) {
-		fields = append(fields, shorturl.FieldExpire)
+	if m.FieldCleared(alias.FieldExpire) {
+		fields = append(fields, alias.FieldExpire)
 	}
 	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *ShortUrlMutation) FieldCleared(name string) bool {
+func (m *AliasMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *ShortUrlMutation) ClearField(name string) error {
+func (m *AliasMutation) ClearField(name string) error {
 	switch name {
-	case shorturl.FieldPv:
+	case alias.FieldPv:
 		m.ClearPv()
 		return nil
-	case shorturl.FieldExpire:
+	case alias.FieldExpire:
 		m.ClearExpire()
 		return nil
 	}
-	return fmt.Errorf("unknown ShortUrl nullable field %s", name)
+	return fmt.Errorf("unknown Alias nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *ShortUrlMutation) ResetField(name string) error {
+func (m *AliasMutation) ResetField(name string) error {
 	switch name {
-	case shorturl.FieldKey:
+	case alias.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case alias.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	case alias.FieldKey:
 		m.ResetKey()
 		return nil
-	case shorturl.FieldURL:
+	case alias.FieldURL:
 		m.ResetURL()
 		return nil
-	case shorturl.FieldPv:
+	case alias.FieldPv:
 		m.ResetPv()
 		return nil
-	case shorturl.FieldExpire:
+	case alias.FieldExpire:
 		m.ResetExpire()
 		return nil
-	case shorturl.FieldCreateAt:
-		m.ResetCreateAt()
-		return nil
-	case shorturl.FieldUpdateAt:
-		m.ResetUpdateAt()
-		return nil
 	}
-	return fmt.Errorf("unknown ShortUrl field %s", name)
+	return fmt.Errorf("unknown Alias field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ShortUrlMutation) AddedEdges() []string {
+func (m *AliasMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *ShortUrlMutation) AddedIDs(name string) []ent.Value {
+func (m *AliasMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ShortUrlMutation) RemovedEdges() []string {
+func (m *AliasMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *ShortUrlMutation) RemovedIDs(name string) []ent.Value {
+func (m *AliasMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ShortUrlMutation) ClearedEdges() []string {
+func (m *AliasMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *ShortUrlMutation) EdgeCleared(name string) bool {
+func (m *AliasMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *ShortUrlMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown ShortUrl unique edge %s", name)
+func (m *AliasMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Alias unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *ShortUrlMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown ShortUrl edge %s", name)
+func (m *AliasMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Alias edge %s", name)
 }

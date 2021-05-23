@@ -40,15 +40,14 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 		}
 		expire = time.Now().Add(time.Duration(expireSec) * time.Second)
 	}
-	shortUrl, err := s.svc.ShortUrl.Shorten(ctx, rawurl, expire)
+	alias, err := s.svc.Shorten(ctx, rawurl, expire)
 	if err != nil {
 		_ = errResp(w, err)
 		return
 	}
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"errcode": 0,
-		"errmsg":  "",
-		"data":    shortUrl.Key,
+		"data":    alias.Key,
 	})
 	return
 }

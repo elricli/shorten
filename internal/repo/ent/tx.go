@@ -12,8 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// ShortUrl is the client for interacting with the ShortUrl builders.
-	ShortUrl *ShortUrlClient
+	// Alias is the client for interacting with the Alias builders.
+	Alias *AliasClient
 
 	// lazily loaded.
 	client     *Client
@@ -149,7 +149,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.ShortUrl = NewShortUrlClient(tx.config)
+	tx.Alias = NewAliasClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -159,7 +159,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: ShortUrl.QueryXXX(), the query will be executed
+// applies a query, for example: Alias.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.
