@@ -26,7 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     formElem.addEventListener("submit", (e) => {
         e.preventDefault();
-        let inputURL = new URL(urlInputElem.value);
+        let inputURLStr = urlInputElem.value
+        if (!/http:\/\/|https:\/\//.test(inputURLStr)) {
+            inputURLStr = "http://" + inputURLStr
+        }
+        let inputURL = ""
+        try {
+            inputURL = new URL(inputURLStr);
+        } catch (e) {
+            err(inputURLStr + " is not valid url")
+            return
+        }
         let locationURL = new URL(window.location.href);
         if (inputURL.hostname === locationURL.hostname) {
             err("can't short this url.")
