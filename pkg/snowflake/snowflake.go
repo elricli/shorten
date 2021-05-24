@@ -1,8 +1,14 @@
 package snowflake
 
 import (
-	"fmt"
+	"errors"
+	"strconv"
 	"time"
+)
+
+var (
+	// Epoch is set to the twitter snowflake epoch of Jun 04 2021 00:00:00 UTC in milliseconds
+	Epoch int64 = 1622764800000
 )
 
 // IDWorker .
@@ -20,17 +26,20 @@ type IDWorker struct {
 }
 
 // NewIDWorker return a id worker.
-func NewIDWorker(workerID, sequence int64) *IDWorker {
+func NewIDWorker(workerID int64) (*IDWorker, error) {
 	var (
-		workerIDBits       int64 = 5
+		workerIDBits       int64 = 3
 		maxWorkerID        int64 = -1 ^ (-1 << workerIDBits)
-		sequenceBits       int64 = 5 // Don't need too large sequence
+		sequenceBits       int64 = 3 // Don't need too large sequence
 		workerIDShift            = sequenceBits
 		timestampLeftShift       = sequenceBits + workerIDBits
 		sequenceMask       int64 = -1 ^ (-1 << sequenceBits)
 	)
+	if workerID < 0 || workerID > maxWorkerID {
+		return nil, errors.New("workerID must between 0 and " + strconv.FormatInt(workerID, 10))
+	}
 	w := &IDWorker{
-		epoch:              1602317796589,
+		epoch:              Epoch,
 		workerIDBits:       workerIDBits,
 		maxWorkerID:        maxWorkerID,
 		sequenceBits:       sequenceBits,
@@ -39,19 +48,16 @@ func NewIDWorker(workerID, sequence int64) *IDWorker {
 		sequenceMask:       sequenceMask,
 		lastTimestamp:      -1,
 		WorkerID:           workerID,
-		Sequence:           sequence,
+		Sequence:           0,
 	}
-	return w
+	return w, nil
 }
 
 // NextID .
-func (worker *IDWorker) NextID() (int64, error) {
+func (worker *IDWorker) NextID() int64 {
 	timestamp := timeGen()
-	if timestamp < worker.lastTimestamp {
-		return 0, fmt.Errorf("clock moved backwards. Refusing to generate id for %d milliseconds", worker.lastTimestamp-timestamp)
-	}
 
-	if worker.lastTimestamp == timestamp {
+	if worker.lastTimestamp >= timestamp {
 		worker.Sequence = (worker.Sequence + 1) & worker.sequenceMask
 		if worker.Sequence == 0 {
 			timestamp = tilNextMillis(worker.lastTimestamp)
@@ -63,7 +69,7 @@ func (worker *IDWorker) NextID() (int64, error) {
 	id := ((timestamp - worker.epoch) << worker.timestampLeftShift) |
 		(worker.WorkerID << worker.workerIDShift) |
 		worker.Sequence
-	return id, nil
+	return id
 }
 
 func timeGen() int64 {

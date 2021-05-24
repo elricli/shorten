@@ -4,18 +4,22 @@ import (
 	"testing"
 )
 
-var (
-	worker *IDWorker
-)
-
-func TestMain(m *testing.M) {
-	worker = NewIDWorker(0x1, 0x2)
-	m.Run()
-}
-
-func TestIDWorker_NextID(t *testing.T) {
-	_, err := worker.NextID()
-	if err != nil {
-		t.Fatal(err)
+func TestNewIDWorker(t *testing.T) {
+	tests := []struct {
+		name     string
+		workerID int64
+		wantErr  bool
+	}{
+		{"normal", 1, false},
+		{"too large workerID", 10, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := NewIDWorker(tt.workerID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewIDWorker() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
 	}
 }

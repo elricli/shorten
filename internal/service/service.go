@@ -20,28 +20,25 @@ type Service struct {
 	log      *zap.SugaredLogger
 }
 
-func New(logger *zap.SugaredLogger, alias alias.Usecase) *Service {
+func New(logger *zap.SugaredLogger, idworker *snowflake.IDWorker, alias alias.Usecase) (*Service, error) {
 	logger = logger.Named("service")
 	return &Service{
 		alias:    alias,
-		idworker: snowflake.NewIDWorker(0x1, 0x1),
+		idworker: idworker,
 		log:      logger,
-	}
+	}, nil
 }
 
 func (s *Service) Shorten(ctx context.Context, url string, expire time.Time) (*alias.Alias, error) {
-	keyID, err := s.idworker.NextID()
-	if err != nil {
-		s.log.Errorw("idworker get next id failed", "error", err)
-		return nil, err
-	}
+	keyID := s.idworker.NextID()
 	key := encode.ToBase62(uint64(keyID))
 	a := &alias.Alias{
 		Key:    key,
 		URL:    url,
 		Expire: expire,
 	}
-	if a, err = s.alias.Save(ctx, a); err != nil {
+	a, err := s.alias.Save(ctx, a)
+	if err != nil {
 		s.log.Errorw("save alias failed", "error", err)
 		return nil, err
 	}

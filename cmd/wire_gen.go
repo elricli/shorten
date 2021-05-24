@@ -10,19 +10,24 @@ import (
 	"github.com/drrrMikado/shorten/internal/repo"
 	"github.com/drrrMikado/shorten/internal/server"
 	"github.com/drrrMikado/shorten/internal/service"
+	"github.com/drrrMikado/shorten/pkg/snowflake"
 	"go.uber.org/zap"
 )
 
 // Injectors from wire.go:
 
-func Init(logger *zap.SugaredLogger, repoCfg repo.Config, opts ...server.Option) (*server.Server, func(), error) {
+func Init(logger *zap.SugaredLogger, serviceIDWorker *snowflake.IDWorker, repoCfg repo.Config, opts ...server.Option) (*server.Server, func(), error) {
 	repoRepo, cleanup, err := repo.New(repoCfg)
 	if err != nil {
 		return nil, nil, err
 	}
 	repository := alias.NewRepository(repoRepo)
 	usecase := alias.NewUseCase(repository, logger)
-	serviceService := service.New(logger, usecase)
+	serviceService, err := service.New(logger, serviceIDWorker, usecase)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
 	serverServer, cleanup2 := server.New(serviceService, logger, opts...)
 	return serverServer, func() {
 		cleanup2()
