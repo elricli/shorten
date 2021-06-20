@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/drrrMikado/shorten/pkg/middleware"
+	"github.com/go-playground/validator/v10"
 )
 
 type Option func(option *option)
@@ -10,6 +11,7 @@ type option struct {
 	network    string
 	address    string
 	middleware middleware.Middleware
+	validator  *validator.Validate
 }
 
 // Network with server network.
@@ -26,6 +28,15 @@ func Address(addr string) Option {
 			addr = _defaultAddr
 		}
 		o.address = addr
+	}
+}
+
+// Validator with validator.
+func Validator(v *validator.Validate) Option {
+	return func(o *option) {
+		if v != nil {
+			o.validator = v
+		}
 	}
 }
 

@@ -15,6 +15,7 @@ import (
 	"github.com/drrrMikado/shorten/pkg/middleware/request"
 	"github.com/drrrMikado/shorten/pkg/rate"
 	"github.com/drrrMikado/shorten/pkg/snowflake"
+	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 )
 
@@ -42,6 +43,7 @@ func main() {
 			limiter.Limiter(rate.NewLimiter(100, 100)),
 			recovery.Recovery(recovery.WithLogger(logger)),
 		)),
+		server.Validator(validator.New()),
 	)
 	if err != nil {
 		panic(err)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/drrrMikado/shorten/internal/service"
 	"github.com/drrrMikado/shorten/public/static"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 	"go.uber.org/zap"
 
@@ -30,8 +31,9 @@ const (
 
 func New(svc *service.Service, logger *zap.SugaredLogger, opts ...Option) (*Server, func()) {
 	opt := option{
-		network: "tcp",
-		address: _defaultAddr,
+		network:   "tcp",
+		address:   _defaultAddr,
+		validator: validator.New(),
 	}
 	for _, o := range opts {
 		o(&opt)

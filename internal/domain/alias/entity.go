@@ -12,8 +12,8 @@ var ProviderSet = wire.NewSet(NewRepository, NewUseCase)
 type Alias struct {
 	ID     int
 	Key    string
-	URL    string
-	Expire time.Time
+	URL    string    `validate:"url"`
+	Expire time.Time `validate:"gt"`
 }
 
 type Usecase interface {

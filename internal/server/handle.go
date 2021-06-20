@@ -4,11 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
-
-	"github.com/drrrMikado/shorten/pkg/validator"
 )
 
 var (
@@ -20,29 +17,22 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	_ = r.ParseForm()
 	rawurl := r.Form.Get("url")
-	if !validator.IsURL(rawurl) {
-		_ = errResp(w, errors.New(rawurl+" is not valid url"))
+	if err := s.opt.validator.Var(rawurl, "required,url"); err != nil {
+		errResp(w, err)
 		return
-	} else if u, err := url.Parse(rawurl); err != nil {
-		_ = errResp(w, err)
-		return
-	} else if u.Scheme == "" {
-		u.Scheme = "http"
-		rawurl = u.String()
 	}
 	expireParam := r.Form.Get("expire")
+	if err := s.opt.validator.Var(expireParam, "gte=0"); err != nil {
+		errResp(w, err)
+		return
+	}
 	var expire time.Time
-	if expireParam != "" {
-		expireSec, err := strconv.Atoi(expireParam)
-		if err != nil {
-			_ = errResp(w, err)
-			return
-		}
+	if expireSec, _ := strconv.Atoi(expireParam); expireSec > 0 {
 		expire = time.Now().Add(time.Duration(expireSec) * time.Second)
 	}
 	alias, err := s.svc.Shorten(ctx, rawurl, expire)
 	if err != nil {
-		_ = errResp(w, err)
+		errResp(w, err)
 		return
 	}
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
@@ -52,8 +42,8 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func errResp(w http.ResponseWriter, err error) error {
-	return json.NewEncoder(w).Encode(map[string]interface{}{
+func errResp(w http.ResponseWriter, err error) {
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"errcode": 1,
 		"errmsg":  err.Error(),
 	})
