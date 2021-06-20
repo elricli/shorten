@@ -47,19 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhr.onload = () => {
             /**
-             * @param {number} resp.errcode - err code
-             * @param {string} resp.errmsg - err message
+             * @param {number} resp.code - code
+             * @param {string} resp.message - message
              */
             let resp = JSON.parse(xhr.responseText);
             if (xhr.status !== 200) {
                 err(xhr.statusText);
                 return;
-            } else if (resp.errcode) {
-                err(resp.errmsg);
+            } else if (resp.code) {
+                err(resp.message);
                 return;
             }
             const href = locationURL.toString()
-            urlInputElem.value = (href.charAt(href.length - 1) !== "/" ? href + "/" : href) + resp.data
+            urlInputElem.value = (href.charAt(href.length - 1) !== "/" ? href + "/" : href) + resp.details.key
             copyBtnElem.style.display = "block";
             submitBtnElem.style.display = "none";
             urlInputElem.addEventListener("change", shortenURLInputTrigger);

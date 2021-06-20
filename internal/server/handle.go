@@ -13,6 +13,12 @@ var (
 	ErrLinkNotExist = errors.New("sorry, the link you accessed doesn't exist on our service. Please keep in mind that our shortened links are case sensitive and may contain letters and numbers")
 )
 
+type response struct {
+	Code    int
+	Message string
+	Detail  interface{}
+}
+
 func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	_ = r.ParseForm()
@@ -35,16 +41,21 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 		errResp(w, err)
 		return
 	}
-	_ = json.NewEncoder(w).Encode(map[string]interface{}{
-		"errcode": 0,
-		"data":    alias.Key,
-	})
+	successResp(w, map[string]string{"key": alias.Key})
 	return
 }
 
 func errResp(w http.ResponseWriter, err error) {
-	_ = json.NewEncoder(w).Encode(map[string]interface{}{
-		"errcode": 1,
-		"errmsg":  err.Error(),
+	_ = json.NewEncoder(w).Encode(response{
+		Code:    1,
+		Message: err.Error(),
+	})
+}
+
+func successResp(w http.ResponseWriter, details interface{}) {
+	_ = json.NewEncoder(w).Encode(response{
+		Code:    0,
+		Message: "",
+		Detail:  details,
 	})
 }
