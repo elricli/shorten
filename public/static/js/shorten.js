@@ -47,19 +47,22 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhr.onload = () => {
             /**
-             * @param {number} resp.code - code
-             * @param {string} resp.message - message
+             * @param {{
+             *     Code: number
+             *     Message: string error message
+             *     Detail: {Key: string}
+             * }} resp
              */
             let resp = JSON.parse(xhr.responseText);
             if (xhr.status !== 200) {
                 err(xhr.statusText);
                 return;
-            } else if (resp.code) {
-                err(resp.message);
+            } else if (resp.Code) {
+                err(resp.Message);
                 return;
             }
             const href = locationURL.toString()
-            urlInputElem.value = (href.charAt(href.length - 1) !== "/" ? href + "/" : href) + resp.details.key
+            urlInputElem.value = (href.charAt(href.length - 1) !== "/" ? href + "/" : href) + resp.Detail.Key;
             copyBtnElem.style.display = "block";
             submitBtnElem.style.display = "none";
             urlInputElem.addEventListener("change", shortenURLInputTrigger);
@@ -90,5 +93,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => {
             err("unable to copy");
         });
-    })
+    });
 });

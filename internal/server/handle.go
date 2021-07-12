@@ -41,7 +41,7 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 		errResp(w, err)
 		return
 	}
-	successResp(w, map[string]string{"key": alias.Key})
+	successResp(w, map[string]string{"Key": alias.Key})
 	return
 }
 
