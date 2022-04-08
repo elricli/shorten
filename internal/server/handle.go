@@ -42,7 +42,6 @@ func (s *Server) shorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	successResp(w, map[string]string{"Key": alias.Key})
-	return
 }
 
 func errResp(w http.ResponseWriter, err error) {

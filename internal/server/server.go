@@ -96,7 +96,6 @@ func (s *Server) initHandler() {
 			}
 			http.Redirect(w, r, longurl, http.StatusMovedPermanently)
 		}
-		return
 	})
 
 	s.Server = &http.Server{
@@ -105,5 +104,4 @@ func (s *Server) initHandler() {
 	if s.opt.middleware != nil {
 		s.Handler = s.opt.middleware(mux)
 	}
-	return
 }

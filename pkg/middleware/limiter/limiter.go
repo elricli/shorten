@@ -17,7 +17,6 @@ func Limiter(l *rate.Limiter) middleware.Middleware {
 				return
 			}
 			h.ServeHTTP(w, r)
-			return
 		})
 	}
 }

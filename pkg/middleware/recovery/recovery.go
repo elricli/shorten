@@ -35,7 +35,6 @@ func Recovery(opts ...Option) middleware.Middleware {
 				}
 			}()
 			h.ServeHTTP(w, r)
-			return
 		})
 	}
 }
